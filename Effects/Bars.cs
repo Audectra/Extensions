@@ -114,7 +114,7 @@ namespace Audectra.Extensions.Effects
             settingsPanel.GroupEnd();
 
             settingsPanel.GroupBegin("Bar Life");
-            settingsPanel.AddBindableTrackbar(this, _maxBarLife, 0, 2.5, (uint)ValueId.MaxBarLife);
+            settingsPanel.AddBindableTrackbar(this, _maxBarLife, 0, 2.5f, (uint)ValueId.MaxBarLife);
             settingsPanel.GroupEnd();
 
             settingsPanel.GroupBegin("Trigger");
