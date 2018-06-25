@@ -21,13 +21,6 @@ namespace Audectra.Extensions.Effects
 		
 		/* Random number generator to create random colors. */
 		private Random _rand;
-		
-		/*	Enumeration for each value you want to be configurable in the layer settings. */
-		private enum ValueId
-		{
-			/*	ValueId for the configurable color. */
-			ColorValue = 0,
-		}
 
 		/* 	This empty constructor is neccessary for Audectras extension loader engine. */
         public BeatColor() { }
@@ -80,9 +73,7 @@ namespace Audectra.Extensions.Effects
 			of your effect. This method generally only gets called once per layer. */
         public override void GenerateSettings(ILayerSettingsPanel settingsPanel)
         {
-			/* 	Add a color group to the layer settings of this effect, such that
-				the user is able to choose or bind a color. */
-            settingsPanel.AddColorGroup(this, _color, (uint) ValueId.ColorValue);
+			/* This effect extension doesn't need any additional settings so far. */
         }
 
 		/*	Every time a configuration option you've secified above has changed, either
@@ -90,10 +81,7 @@ namespace Audectra.Extensions.Effects
 			method will be called, to inform you on which of your values has changed. */
         public override void ValueChanged(uint valueId, object value)
         {
-			/*	The color value has been changed either by the user or a binding. Use the 
-				effect helper to convert the value to a color. */
-            if ((ValueId)valueId == ValueId.ColorValue)
-                _color = _helper.ValueToColor(value);
+			
         }
 
 		/*	Return the name of this effect. */
@@ -105,7 +93,7 @@ namespace Audectra.Extensions.Effects
 		/*	Return the version of this effect. */
         public string GetVersion()
         {
-            return "v1.0.0";
+            return "v1.0.1";
         }
 
 		/*	Return the author of this effect. */
