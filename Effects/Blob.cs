@@ -75,10 +75,10 @@ namespace Audectra.Extensions.Effects
             settingsPanel.GroupEnd();
 
             settingsPanel.GroupBegin("Size");
-            settingsPanel.AddTrackbar(this, _xSize, 0, Width, (uint)ValueId.XSizeValue);
+            settingsPanel.AddBindableTrackbar(this, _xSize, 0, Width, (uint)ValueId.XSizeValue);
 
             if (Height > 1)
-                settingsPanel.AddTrackbar(this, _ySize, 0, Height, (uint) ValueId.YSizeValue);
+                settingsPanel.AddBindableTrackbar(this, _ySize, 0, Height, (uint) ValueId.YSizeValue);
 
             settingsPanel.GroupEnd();
         }
