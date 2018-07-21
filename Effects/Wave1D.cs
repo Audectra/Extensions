@@ -26,6 +26,9 @@ namespace Audectra.Extensions.Effects
 		{
 			/*	ValueId for the configurable color. */
 			ColorValue = 0,
+			
+			/*	ValueId for configurable wave speed */
+			WaveSpeed,
 		}
 		
 		/*	Enumeration for each trigger you want to be configurable in the layer settings. */
@@ -83,8 +86,15 @@ namespace Audectra.Extensions.Effects
 				the user is able to choose or bind a color. */
             settingsPanel.AddColorGroup(this, _color, (uint) ValueId.ColorValue);
 			
+			/*	Add a bindable trackbar for the wave speed. */
+			settingsPanel.GroupBegin("Speed");
+			settingsPanel.AddBindableTrackbar(this, (float)_waveSimulation.Speed, 1.0f, 4.0f, (uint) ValueId.WaveSpeed);
+			settingsPanel.GroupEnd();
+			
 			/*	Add a trigger for the AddDrop trigger id to the settings group */
+			settingsPanel.GroupBegin("Droplet");
 			settingsPanel.AddBindableTrigger(this, (uint) TriggerId.AddDrop);
+			settingsPanel.GroupEnd();
         }
 
 		/*	Every time a configuration option you've secified above has changed, either
@@ -92,10 +102,20 @@ namespace Audectra.Extensions.Effects
 			method will be called, to inform you on which of your values has changed. */
         public override void ValueChanged(uint valueId, object value)
         {
-			/*	The color value has been changed either by the user or a binding. Use the 
+			switch ((ValueId)valueId)
+			{
+				/*	The color value has been changed either by the user or a binding. Use the 
 				effect helper to convert the value to a color. */
-            if ((ValueId)valueId == ValueId.ColorValue)
-                _color = _helper.ValueToColor(value);
+				case ValueId.ColorValue:
+					_color = _helper.ValueToColor(value);
+					break;
+				
+				/*	The wave speed has been changed either by the user or a binding. Use the
+					effect helper to convert the value to a single. */
+				case ValueId.WaveSpeed:
+					_waveSimulation.Speed = _helper.ValueToSingle(value);
+					break;
+			}
         }
 		
 		/*	Every time a configured trigger is triggered, either manually by the user
@@ -122,7 +142,7 @@ namespace Audectra.Extensions.Effects
 		/*	Return the version of this effect. */
         public string GetVersion()
         {
-            return "v1.0.0";
+            return "v1.0.1";
         }
 
 		/*	Return the author of this effect. */
