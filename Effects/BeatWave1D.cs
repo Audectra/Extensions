@@ -20,6 +20,13 @@ namespace Audectra.Extensions.Effects
         private IRgbRender _render;
 		private IWaveSimulation1D _waveSimulation;
 		
+		/*	Enumeration for each value you want to be configurable in the layer settings. */
+		private enum ValueId
+		{
+			/*	ValueId for configurable wave speed */
+			WaveSpeed = 0,
+		}
+		
 		/* 	This empty constructor is neccessary for Audectras extension loader engine. */
         public BeatWave1D() { }
 
@@ -68,7 +75,10 @@ namespace Audectra.Extensions.Effects
 			of your effect. This method generally only gets called once per layer. */
         public override void GenerateSettings(ILayerSettingsPanel settingsPanel)
         {
-			
+			/*	Add a bindable trackbar for the wave speed. */
+			settingsPanel.GroupBegin("Speed");
+			settingsPanel.AddBindableTrackbar(this, (float)_waveSimulation.Speed, 1.0f, 4.0f, (uint) ValueId.WaveSpeed);
+			settingsPanel.GroupEnd();
         }
 
 		/*	Every time a configuration option you've secified above has changed, either
@@ -76,7 +86,14 @@ namespace Audectra.Extensions.Effects
 			method will be called, to inform you on which of your values has changed. */
         public override void ValueChanged(uint valueId, object value)
         {
-			
+			switch ((ValueId)valueId)
+			{
+				/*	The wave speed has been changed either by the user or a binding. Use the
+					effect helper to convert the value to a single. */
+				case ValueId.WaveSpeed:
+					_waveSimulation.Speed = _helper.ValueToSingle(value);
+					break;
+			}
         }
 		
 		/*	Return the name of this effect. */
@@ -88,7 +105,7 @@ namespace Audectra.Extensions.Effects
 		/*	Return the version of this effect. */
         public string GetVersion()
         {
-            return "v1.0.0";
+            return "v1.0.1";
         }
 
 		/*	Return the author of this effect. */
