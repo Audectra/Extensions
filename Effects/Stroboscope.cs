@@ -17,14 +17,12 @@ namespace Audectra.Extensions.Effects
         private RgbColor _color;
         private IRgbRender _render;
 
-        private bool _isActive;
         private float _flashDuration;
 
         private const float MaxFlashDuration = 0.1f;
 
         private enum TriggerId
         {
-            Active,
             Flash,
         }
 
@@ -37,7 +35,6 @@ namespace Audectra.Extensions.Effects
             _render = _helper.CreateRender();
 
             _flashDuration = MaxFlashDuration;
-            _isActive = false;
         }
 
         public override IRgbRender Render(float dt)
@@ -56,10 +53,6 @@ namespace Audectra.Extensions.Effects
 
         public override void GenerateSettings(ILayerSettingsPanel settingsPanel)
         {
-            settingsPanel.GroupBegin("Active");
-            settingsPanel.AddBindableTrigger(this, (uint)TriggerId.Active);
-            settingsPanel.GroupEnd();
-
             settingsPanel.GroupBegin("Trigger");
             settingsPanel.AddBindableTrigger(this, (uint)TriggerId.Flash);
             settingsPanel.GroupEnd();
@@ -70,16 +63,12 @@ namespace Audectra.Extensions.Effects
             
         }
 
-        public override void Trigger(uint triggerId, bool enable)
+        public override void Trigger(uint triggerId, bool risingEdge)
         {
             switch ((TriggerId) triggerId)
             {
-                case TriggerId.Active:
-                    _isActive = enable;
-                    break;
-
                 case TriggerId.Flash:
-                    if (_isActive && enable)
+                    if (risingEdge)
                     {
                         _color = new RgbColor(1, 1, 1);
                         _flashDuration = 0;
@@ -95,7 +84,7 @@ namespace Audectra.Extensions.Effects
 
         public string GetVersion()
         {
-            return "v1.0.0";
+            return "v1.0.1";
         }
 
         public string GetAuthor()
