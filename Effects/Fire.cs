@@ -7,7 +7,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-using Audectra.GUI;
+using Audectra.Gui;
 using Audectra.Graphics;
 using Audectra.Graphics.Effects;
 using Audectra.Graphics.Particles;

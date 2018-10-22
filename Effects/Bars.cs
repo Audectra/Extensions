@@ -6,7 +6,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-using Audectra.GUI;
+using Audectra.Gui;
 using Audectra.Graphics;
 using Audectra.Graphics.Effects;
 

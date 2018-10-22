@@ -5,7 +5,7 @@
 
 using System;
 
-using Audectra.GUI;
+using Audectra.Gui;
 using Audectra.Graphics;
 using Audectra.Graphics.Effects;
 
