@@ -5,9 +5,11 @@
 
 using System;
 
-using Audectra.Gui;
 using Audectra.Graphics;
-using Audectra.Graphics.Effects;
+using Audectra.Layers;
+using Audectra.Layers.Effects;
+using Audectra.Layers.Settings;
+
 
 /* Your effects need to be in this namesapce. */
 namespace Audectra.Extensions.Effects
@@ -20,7 +22,7 @@ namespace Audectra.Extensions.Effects
         private IRgbRender _render;
 		
 		/*	Enumeration for each value you want to be configurable in the layer settings. */
-		private enum ValueId
+		private enum SettingId
 		{
 			/*	ValueId for the configurable color. */
 			ColorValue = 0,
@@ -30,7 +32,7 @@ namespace Audectra.Extensions.Effects
         public SimpleColor() { }
 
 		/*	This constructor will be called when a layer of your effect is being created. */
-        public SimpleColor(IEffectHelper effectHelper, int height, int width) : base(height, width)
+        public SimpleColor(IEffectHelper effectHelper, int width, int height) : base(width, height)
         {
 			/*	Save the effect helper in your class, you will need it. */
             _helper = effectHelper;
@@ -47,7 +49,7 @@ namespace Audectra.Extensions.Effects
         public override IRgbRender Render(float dt)
         {
 			/* 	Map every pixel in the render to the configured color */
-            _render.Map((color, x, y) => _color);
+            _render.Map((x, y) => _color);
             return _render;
         }
 
@@ -55,21 +57,25 @@ namespace Audectra.Extensions.Effects
 			to specify what exactly is configureable. In this method you will specify
 			what controls you request from Audectra for the layer settings side panel
 			of your effect. This method generally only gets called once per layer. */
-        public override void GenerateSettings(ILayerSettingsPanel settingsPanel)
+        public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
         {
-			/* 	Add a color group to the layer settings of this effect, such that
+            settingsBuilder.PageBegin();
+			
+            /* 	Add a color group to the layer settings of this effect, such that
 				the user is able to choose or bind a color. */
-            settingsPanel.AddColorGroup(this, _color, (uint) ValueId.ColorValue);
+            settingsBuilder.AddColorGroup(this, _color, (uint) SettingId.ColorValue);
+            
+            settingsBuilder.PageEnd();
         }
 
 		/*	Every time a configuration option you've secified above has changed, either
 			due user interaction in the layer settings or due a feature binding, this 
 			method will be called, to inform you on which of your values has changed. */
-        public override void ValueChanged(uint valueId, object value)
+        public override void OnSettingChanged(uint settingId, object value)
         {
 			/*	The color value has been changed either by the user or a binding. Use the 
 				effect helper to convert the value to a color. */
-            if ((ValueId)valueId == ValueId.ColorValue)
+            if ((SettingId)settingId == SettingId.ColorValue)
                 _color = _helper.ValueToColor(value);
         }
 
@@ -82,7 +88,7 @@ namespace Audectra.Extensions.Effects
 		/*	Return the version of this effect. */
         public string GetVersion()
         {
-            return "v1.0.0";
+            return "v1.1.0";
         }
 
 		/*	Return the author of this effect. */

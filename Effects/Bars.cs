@@ -6,9 +6,10 @@
 using System;
 using System.Runtime.InteropServices;
 
-using Audectra.Gui;
 using Audectra.Graphics;
-using Audectra.Graphics.Effects;
+using Audectra.Layers;
+using Audectra.Layers.Effects;
+using Audectra.Layers.Settings;
 
 namespace Audectra.Extensions.Effects
 {
@@ -35,7 +36,7 @@ namespace Audectra.Extensions.Effects
 
         private readonly object _barsLock = new object();
 
-        private enum ValueId
+        private enum SettingId
         {
             Color = 0,
             NumBars,
@@ -49,7 +50,7 @@ namespace Audectra.Extensions.Effects
 
         public Bars() { }
 
-        public Bars(IEffectHelper effectHelper, int height, int width) : base(height, width)
+        public Bars(IEffectHelper effectHelper, int width, int height) : base(width, height)
         {
             _helper = effectHelper;
             _color = new RgbColor(0, 0.5f, 0.5f);
@@ -105,32 +106,35 @@ namespace Audectra.Extensions.Effects
             }
         }
 
-        public override void GenerateSettings(ILayerSettingsPanel settingsPanel)
+        public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
         {
-            settingsPanel.AddColorGroup(this, _color, (uint)ValueId.Color);
+            settingsBuilder.PageBegin();
+            settingsBuilder.AddColorGroup(this, _color, (uint)SettingId.Color);
 
-            settingsPanel.GroupBegin("Num Bars");
-            settingsPanel.AddTrackbar(this, _numBars, 1, _maxNumBars, (uint)ValueId.NumBars);
-            settingsPanel.GroupEnd();
+            settingsBuilder.GroupBegin("Num Bars");
+            settingsBuilder.AddSlider(this, _numBars, 1, _maxNumBars, (uint)SettingId.NumBars);
+            settingsBuilder.GroupEnd();
 
-            settingsPanel.GroupBegin("Bar Life");
-            settingsPanel.AddBindableTrackbar(this, _maxBarLife, 0, 2.5f, (uint)ValueId.MaxBarLife);
-            settingsPanel.GroupEnd();
+            settingsBuilder.GroupBegin("Bar Life");
+            settingsBuilder.AddBindableSlider(this, _maxBarLife, 0, 2.5f, (uint)SettingId.MaxBarLife);
+            settingsBuilder.GroupEnd();
 
-            settingsPanel.GroupBegin("Trigger");
-            settingsPanel.AddBindableTrigger(this, (uint)TriggerId.BarBoom);
-            settingsPanel.GroupEnd();
+            settingsBuilder.GroupBegin("Trigger");
+            settingsBuilder.AddBindableTrigger(this, (uint)TriggerId.BarBoom);
+            settingsBuilder.GroupEnd();
+            
+            settingsBuilder.PageEnd();
         }
 
-        public override void ValueChanged(uint valueId, object value)
+        public override void OnSettingChanged(uint settingId, object value)
         {
-            switch ((ValueId) valueId)
+            switch ((SettingId) settingId)
             {
-                case ValueId.Color:
+                case SettingId.Color:
                     _color = _helper.ValueToColor(value);
                     break;
 
-                case ValueId.NumBars:
+                case SettingId.NumBars:
                     lock (_barsLock)
                     {
                         _numBars = _helper.ValueToInt(value);
@@ -140,7 +144,7 @@ namespace Audectra.Extensions.Effects
                     }
                     break;
 
-                case ValueId.MaxBarLife:
+                case SettingId.MaxBarLife:
                     lock (_barsLock)
                     {
                         _maxBarLife = _helper.ValueToSingle(value);
@@ -149,9 +153,9 @@ namespace Audectra.Extensions.Effects
             }
         }
 
-        public override void Trigger(uint triggerId, bool enable)
+        public override void OnTrigger(uint triggerId, bool risingEdge)
         {
-            if (!enable)
+            if (!risingEdge)
                 return;
 
             switch ((TriggerId) triggerId)
@@ -191,7 +195,7 @@ namespace Audectra.Extensions.Effects
 
         public string GetVersion()
         {
-            return "v1.0.0";
+            return "v1.1.0";
         }
 
         public string GetAuthor()

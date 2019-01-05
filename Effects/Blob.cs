@@ -5,9 +5,11 @@
 
 using System;
 
-using Audectra.Gui;
 using Audectra.Graphics;
-using Audectra.Graphics.Effects;
+using Audectra.Layers;
+using Audectra.Layers.Effects;
+using Audectra.Layers.Settings;
+
 
 namespace Audectra.Extensions.Effects
 {
@@ -22,7 +24,7 @@ namespace Audectra.Extensions.Effects
         private float _xSize;
         private float _ySize;
 
-        private enum ValueId
+        private enum SettingId
         {
             ColorValue = 0,
             XPositionValue,
@@ -33,7 +35,7 @@ namespace Audectra.Extensions.Effects
 
         public Blob() { }
 
-        public Blob(IEffectHelper effectHelper, int height, int width) : base(height, width)
+        public Blob(IEffectHelper effectHelper, int width, int height) : base(width, height)
         {
             _helper = effectHelper;
             _color = new RgbColor(0, 0.5f, 0.5f);
@@ -62,48 +64,50 @@ namespace Audectra.Extensions.Effects
             return _render;
         }
 
-        public override void GenerateSettings(ILayerSettingsPanel settingsPanel)
+        public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
         {
-            settingsPanel.AddColorGroup(this, _color, (uint)ValueId.ColorValue);
+            settingsBuilder.PageBegin();
+            settingsBuilder.AddColorGroup(this, _color, (uint)SettingId.ColorValue);
 
-            settingsPanel.GroupBegin("Position");
-            settingsPanel.AddTrackbar(this, _x0Pos, 0, Width, (uint)ValueId.XPositionValue);
-
-            if (Height > 1)
-                settingsPanel.AddTrackbar(this, _y0Pos, 0, Height, (uint)ValueId.YPositionValue);
-
-            settingsPanel.GroupEnd();
-
-            settingsPanel.GroupBegin("Size");
-            settingsPanel.AddBindableTrackbar(this, _xSize, 0, Width, (uint)ValueId.XSizeValue);
+            settingsBuilder.GroupBegin("Position");
+            settingsBuilder.AddSlider(this, _x0Pos, 0, Width, (uint)SettingId.XPositionValue);
 
             if (Height > 1)
-                settingsPanel.AddBindableTrackbar(this, _ySize, 0, Height, (uint) ValueId.YSizeValue);
+                settingsBuilder.AddSlider(this, _y0Pos, 0, Height, (uint)SettingId.YPositionValue);
 
-            settingsPanel.GroupEnd();
+            settingsBuilder.GroupEnd();
+
+            settingsBuilder.GroupBegin("Size");
+            settingsBuilder.AddBindableSlider(this, _xSize, 0, Width, (uint)SettingId.XSizeValue);
+
+            if (Height > 1)
+                settingsBuilder.AddBindableSlider(this, _ySize, 0, Height, (uint) SettingId.YSizeValue);
+
+            settingsBuilder.GroupEnd();
+            settingsBuilder.PageEnd();
         }
 
-        public override void ValueChanged(uint valueId, object value)
+        public override void OnSettingChanged(uint settingId, object value)
         {
-            switch ((ValueId) valueId)
+            switch ((SettingId) settingId)
             {
-                case ValueId.ColorValue:
+                case SettingId.ColorValue:
                     _color = _helper.ValueToColor(value);
                     break;
 
-                case ValueId.XPositionValue:
+                case SettingId.XPositionValue:
                     _x0Pos = _helper.ValueToSingle(value);
                     break;
 
-                case ValueId.YPositionValue:
+                case SettingId.YPositionValue:
                     _y0Pos = _helper.ValueToSingle(value);
                     break;
 
-                case ValueId.XSizeValue:
+                case SettingId.XSizeValue:
                     _xSize = _helper.ValueToSingle(value);
                     break;
 
-                case ValueId.YSizeValue:
+                case SettingId.YSizeValue:
                     _ySize = _helper.ValueToSingle(value);
                     break;
             }
@@ -116,7 +120,7 @@ namespace Audectra.Extensions.Effects
 
         public string GetVersion()
         {
-            return "v1.0.0";
+            return "v1.1.0";
         }
 
         public string GetAuthor()

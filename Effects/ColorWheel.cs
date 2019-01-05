@@ -5,9 +5,11 @@
 
 using System;
 
-using Audectra.Gui;
 using Audectra.Graphics;
-using Audectra.Graphics.Effects;
+using Audectra.Layers;
+using Audectra.Layers.Effects;
+using Audectra.Layers.Settings;
+
 
 namespace Audectra.Extensions.Effects
 {
@@ -26,7 +28,7 @@ namespace Audectra.Extensions.Effects
         private const float MinScale = 0.25f;
         private const float MaxScale = 2;
 
-        private enum ValueId
+        private enum SettingId
         {
             Speed,
             Scale,
@@ -34,7 +36,7 @@ namespace Audectra.Extensions.Effects
 
         public ColorWheel() { }
 
-        public ColorWheel(IEffectHelper effectHelper, int height, int width) : base(height, width)
+        public ColorWheel(IEffectHelper effectHelper, int width, int height) : base(width, height)
         {
             _helper = effectHelper;
             _color = new RgbColor(0, 0.5f, 0.5f);
@@ -48,7 +50,7 @@ namespace Audectra.Extensions.Effects
         public override IRgbRender Render(float dt)
         {
             _offset = (_offset + _speed * dt) % 360;
-            _render.Map((color, x, y) =>
+            _render.Map((x, y) =>
             {
                 float hue = ((float) x / Width * 360f * _scale + _offset) % 360;
                 return new HsvColor(hue, 1, 1);
@@ -57,26 +59,30 @@ namespace Audectra.Extensions.Effects
             return _render;
         }
 
-        public override void GenerateSettings(ILayerSettingsPanel settingsPanel)
+        public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
         {
-            settingsPanel.GroupBegin("Scale");
-            settingsPanel.AddTrackbar(this, _scale, MinScale, MaxScale, (uint)ValueId.Scale);
-            settingsPanel.GroupEnd();
+            settingsBuilder.PageBegin();
 
-            settingsPanel.GroupBegin("Speed");
-            settingsPanel.AddBindableTrackbar(this, _speed, 0, MaxSpeed, (uint)ValueId.Speed);
-            settingsPanel.GroupEnd();
+            settingsBuilder.GroupBegin("Scale");
+            settingsBuilder.AddSlider(this, _scale, MinScale, MaxScale, (uint)SettingId.Scale);
+            settingsBuilder.GroupEnd();
+
+            settingsBuilder.GroupBegin("Speed");
+            settingsBuilder.AddBindableSlider(this, _speed, 0, MaxSpeed, (uint)SettingId.Speed);
+            settingsBuilder.GroupEnd();
+
+            settingsBuilder.PageEnd();
         }
 
-        public override void ValueChanged(uint valueId, object value)
+        public override void OnSettingChanged(uint settingId, object value)
         {
-            switch ((ValueId) valueId)
+            switch ((SettingId) settingId)
             {
-                case ValueId.Speed:
+                case SettingId.Speed:
                     _speed = _helper.ValueToSingle(value);
                     break;
 
-                case ValueId.Scale:
+                case SettingId.Scale:
                     _scale = _helper.ValueToSingle(value);
                     break;
             }
@@ -89,7 +95,7 @@ namespace Audectra.Extensions.Effects
 
         public string GetVersion()
         {
-            return "v1.0.0";
+            return "v1.1.0";
         }
 
         public string GetAuthor()

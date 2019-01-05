@@ -5,9 +5,10 @@
 
 using System;
 
-using Audectra.Gui;
 using Audectra.Graphics;
-using Audectra.Graphics.Effects;
+using Audectra.Layers;
+using Audectra.Layers.Effects;
+using Audectra.Layers.Settings;
 using Audectra.Mathematics;
 
 /* Your effects need to be in this namesapce. */
@@ -42,7 +43,7 @@ namespace Audectra.Extensions.Effects
         public Wave1D() { }
 
 		/*	This constructor will be called when a layer of your effect is being created. */
-        public Wave1D(IEffectHelper effectHelper, int height, int width) : base(height, width)
+        public Wave1D(IEffectHelper effectHelper, int width, int height) : base(width, height)
         {
 			/*	Save the effect helper in your class, you will need it. */
             _helper = effectHelper;
@@ -80,27 +81,31 @@ namespace Audectra.Extensions.Effects
 			to specify what exactly is configureable. In this method you will specify
 			what controls you request from Audectra for the layer settings side panel
 			of your effect. This method generally only gets called once per layer. */
-        public override void GenerateSettings(ILayerSettingsPanel settingsPanel)
+        public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
         {
+			settingsBuilder.PageBegin();
+
 			/* 	Add a color group to the layer settings of this effect, such that
 				the user is able to choose or bind a color. */
-            settingsPanel.AddColorGroup(this, _color, (uint) ValueId.ColorValue);
+            settingsBuilder.AddColorGroup(this, _color, (uint) ValueId.ColorValue);
 			
 			/*	Add a bindable trackbar for the wave speed. */
-			settingsPanel.GroupBegin("Speed");
-			settingsPanel.AddBindableTrackbar(this, (float)_waveSimulation.Speed, 1.0f, 4.0f, (uint) ValueId.WaveSpeed);
-			settingsPanel.GroupEnd();
+			settingsBuilder.GroupBegin("Speed");
+			settingsBuilder.AddBindableSlider(this, (float)_waveSimulation.Speed, 1.0f, 4.0f, (uint) ValueId.WaveSpeed);
+			settingsBuilder.GroupEnd();
 			
 			/*	Add a trigger for the AddDrop trigger id to the settings group */
-			settingsPanel.GroupBegin("Droplet");
-			settingsPanel.AddBindableTrigger(this, (uint) TriggerId.AddDrop);
-			settingsPanel.GroupEnd();
+			settingsBuilder.GroupBegin("Droplet");
+			settingsBuilder.AddBindableTrigger(this, (uint) TriggerId.AddDrop);
+			settingsBuilder.GroupEnd();
+
+			settingsBuilder.PageEnd();
         }
 
 		/*	Every time a configuration option you've secified above has changed, either
 			due user interaction in the layer settings or due a feature binding, this 
 			method will be called, to inform you on which of your values has changed. */
-        public override void ValueChanged(uint valueId, object value)
+        public override void OnSettingChanged(uint valueId, object value)
         {
 			switch ((ValueId)valueId)
 			{
@@ -120,7 +125,7 @@ namespace Audectra.Extensions.Effects
 		
 		/*	Every time a configured trigger is triggered, either manually by the user
 			or due to a feature binding, this method will be called.*/
-		public override void Trigger(uint triggerId, bool risingEdge)
+		public override void OnTrigger(uint triggerId, bool risingEdge)
 		{
 			/*	We only want to be triggerd on rising edges. */
 			if (!risingEdge)
@@ -142,7 +147,7 @@ namespace Audectra.Extensions.Effects
 		/*	Return the version of this effect. */
         public string GetVersion()
         {
-            return "v1.0.1";
+            return "v1.1.0";
         }
 
 		/*	Return the author of this effect. */

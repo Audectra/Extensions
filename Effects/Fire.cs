@@ -7,10 +7,12 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-using Audectra.Gui;
 using Audectra.Graphics;
-using Audectra.Graphics.Effects;
 using Audectra.Graphics.Particles;
+using Audectra.Layers;
+using Audectra.Layers.Effects;
+using Audectra.Layers.Settings;
+
 
 namespace Audectra.Extensions.Effects
 {
@@ -29,7 +31,7 @@ namespace Audectra.Extensions.Effects
         private const float MaxEmissionRate = 50f;
         private const float MaxParticleSize = 16f;
 
-        private enum ValueId
+        private enum SettingId
         {
             BeginColorValue = 0,
             EmissionRateValue,
@@ -41,7 +43,7 @@ namespace Audectra.Extensions.Effects
 
         public Fire() { }
 
-        public Fire(IEffectHelper effectHelper, int height, int width) : base(height, width)
+        public Fire(IEffectHelper effectHelper, int width, int height) : base(width, height)
         {
             _helper = effectHelper;
             _render = _helper.CreateRender();
@@ -91,61 +93,65 @@ namespace Audectra.Extensions.Effects
             return _render;
         }
 
-        public override void GenerateSettings(ILayerSettingsPanel settingsPanel)
+        public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
         {
-            settingsPanel.GroupBegin("Emission Rate");
-            settingsPanel.AddBindableTrackbar(this, _particleEmitters[0].EmissionRate, 0, MaxEmissionRate, (uint)ValueId.EmissionRateValue);
-            settingsPanel.GroupEnd();
+            settingsBuilder.PageBegin();
 
-            settingsPanel.GroupBegin("Velocity");
-            settingsPanel.AddTrackbar(this, _particleEmitters[0].MinSpeed, 0, MaxParticleSpeed, (uint)ValueId.ParticleSpeedValue);
-            settingsPanel.GroupEnd();
+            settingsBuilder.GroupBegin("Emission Rate");
+            settingsBuilder.AddBindableSlider(this, _particleEmitters[0].EmissionRate, 0, MaxEmissionRate, (uint)SettingId.EmissionRateValue);
+            settingsBuilder.GroupEnd();
 
-            settingsPanel.GroupBegin("Life");
-            settingsPanel.AddTrackbar(this, _particleEmitters[0].MinLife, 0, MaxParticleLife, (uint)ValueId.ParticleLifeValue);
-            settingsPanel.GroupEnd();
+            settingsBuilder.GroupBegin("Velocity");
+            settingsBuilder.AddSlider(this, _particleEmitters[0].MinSpeed, 0, MaxParticleSpeed, (uint)SettingId.ParticleSpeedValue);
+            settingsBuilder.GroupEnd();
+
+            settingsBuilder.GroupBegin("Life");
+            settingsBuilder.AddSlider(this, _particleEmitters[0].MinLife, 0, MaxParticleLife, (uint)SettingId.ParticleLifeValue);
+            settingsBuilder.GroupEnd();
             
-            settingsPanel.AddColorGroup(this, _beginColor, (uint)ValueId.BeginColorValue);
+            settingsBuilder.AddColorGroup(this, _beginColor, (uint)SettingId.BeginColorValue);
 
-            settingsPanel.GroupBegin("Begin Size");
-            settingsPanel.AddTrackbar(this, _particleEmitters[0].BeginConfig.MinSize, 1, MaxParticleSize, (uint)ValueId.ParticleBeginSizeValue);
-            settingsPanel.GroupEnd();
+            settingsBuilder.GroupBegin("Begin Size");
+            settingsBuilder.AddSlider(this, _particleEmitters[0].BeginConfig.MinSize, 1, MaxParticleSize, (uint)SettingId.ParticleBeginSizeValue);
+            settingsBuilder.GroupEnd();
 
-            settingsPanel.GroupBegin("End Size");
-            settingsPanel.AddTrackbar(this, _particleEmitters[0].EndConfig.MinSize, 0, MaxParticleSize, (uint)ValueId.ParticleEndSizeValue);
-            settingsPanel.GroupEnd();
+            settingsBuilder.GroupBegin("End Size");
+            settingsBuilder.AddSlider(this, _particleEmitters[0].EndConfig.MinSize, 0, MaxParticleSize, (uint)SettingId.ParticleEndSizeValue);
+            settingsBuilder.GroupEnd();
+
+            settingsBuilder.PageEnd();
         }
 
-        public override void ValueChanged(uint valueId, object value)
+        public override void OnSettingChanged(uint settingId, object value)
         {
-            switch ((ValueId) valueId)
+            switch ((SettingId) settingId)
             {
-                case ValueId.BeginColorValue:
+                case SettingId.BeginColorValue:
                     _particleEmitters.ForEach(emitter => 
                         emitter.BeginConfig.SetColor(_helper.ValueToColor(value)));
                     break;
 
-                case ValueId.EmissionRateValue:
+                case SettingId.EmissionRateValue:
                     _particleEmitters.ForEach(emitter => 
                         emitter.SetEmissionRate(_helper.ValueToSingle(value)));
                     break;
 
-                case ValueId.ParticleSpeedValue:
+                case SettingId.ParticleSpeedValue:
                     _particleEmitters.ForEach(emitter => 
                         emitter.SetSpeed(_helper.ValueToSingle(value)));
                     break;
 
-                case ValueId.ParticleLifeValue:
+                case SettingId.ParticleLifeValue:
                     _particleEmitters.ForEach(emitter => 
                         emitter.SetLife(_helper.ValueToSingle(value)));
                     break;
 
-                case ValueId.ParticleBeginSizeValue:
+                case SettingId.ParticleBeginSizeValue:
                     _particleEmitters.ForEach(emitter => 
                         emitter.BeginConfig.SetSize(_helper.ValueToSingle(value)));
                     break;
 
-                case ValueId.ParticleEndSizeValue:
+                case SettingId.ParticleEndSizeValue:
                     _particleEmitters.ForEach(emitter => 
                         emitter.EndConfig.SetSize(_helper.ValueToSingle(value)));
                     break;
@@ -159,7 +165,7 @@ namespace Audectra.Extensions.Effects
 
         public string GetVersion()
         {
-            return "v1.0.0";
+            return "v1.1.0";
         }
 
         public string GetAuthor()

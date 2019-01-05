@@ -5,9 +5,11 @@
 
 using System;
 
-using Audectra.Gui;
 using Audectra.Graphics;
-using Audectra.Graphics.Effects;
+using Audectra.Layers;
+using Audectra.Layers.Effects;
+using Audectra.Layers.Settings;
+
 
 namespace Audectra.Extensions.Effects
 {
@@ -19,7 +21,7 @@ namespace Audectra.Extensions.Effects
 
         private float _barValue;
 
-        private enum ValueId
+        private enum SettingId
         {
             Color,
             BarValue,
@@ -27,7 +29,7 @@ namespace Audectra.Extensions.Effects
 
         public ValueBar() { }
 
-        public ValueBar(IEffectHelper effectHelper, int height, int width) : base(height, width)
+        public ValueBar(IEffectHelper effectHelper, int width, int height) : base(width, height)
         {
             _helper = effectHelper;
             _color = new RgbColor(0, 0.5f, 0.5f);
@@ -44,24 +46,27 @@ namespace Audectra.Extensions.Effects
             return _render;
         }
 
-        public override void GenerateSettings(ILayerSettingsPanel settingsPanel)
+        public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
         {
-            settingsPanel.AddColorGroup(this, _color, (uint)ValueId.Color);
+            settingsBuilder.PageBegin();
+            settingsBuilder.AddColorGroup(this, _color, (uint)SettingId.Color);
 
-            settingsPanel.GroupBegin("Value");
-            settingsPanel.AddBindableTrackbar(this, _barValue, 0, 1, (uint)ValueId.BarValue);
-            settingsPanel.GroupEnd();
+            settingsBuilder.GroupBegin("Value");
+            settingsBuilder.AddBindableSlider(this, _barValue, 0, 1, (uint)SettingId.BarValue);
+            settingsBuilder.GroupEnd();
+
+            settingsBuilder.PageEnd();
         }
 
-        public override void ValueChanged(uint valueId, object value)
+        public override void OnSettingChanged(uint settingId, object value)
         {
-            switch ((ValueId) valueId)
+            switch ((SettingId) settingId)
             {
-                case ValueId.Color:
+                case SettingId.Color:
                     _color = _helper.ValueToColor(value);
                     break;
 
-                case ValueId.BarValue:
+                case SettingId.BarValue:
                     _barValue = _helper.ValueToSingle(value);
                     break;
             }
@@ -74,7 +79,7 @@ namespace Audectra.Extensions.Effects
 
         public string GetVersion()
         {
-            return "v1.0.0";
+            return "v1.1.0";
         }
 
         public string GetAuthor()

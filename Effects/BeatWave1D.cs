@@ -5,9 +5,10 @@
 
 using System;
 
-using Audectra.Gui;
 using Audectra.Graphics;
-using Audectra.Graphics.Effects;
+using Audectra.Layers;
+using Audectra.Layers.Effects;
+using Audectra.Layers.Settings;
 using Audectra.Mathematics;
 
 /* Your effects need to be in this namesapce. */
@@ -21,7 +22,7 @@ namespace Audectra.Extensions.Effects
 		private IWaveSimulation1D _waveSimulation;
 		
 		/*	Enumeration for each value you want to be configurable in the layer settings. */
-		private enum ValueId
+		private enum SettingId
 		{
 			/*	ValueId for configurable wave speed */
 			WaveSpeed = 0,
@@ -31,7 +32,7 @@ namespace Audectra.Extensions.Effects
         public BeatWave1D() { }
 
 		/*	This constructor will be called when a layer of your effect is being created. */
-        public BeatWave1D(IEffectHelper effectHelper, int height, int width) : base(height, width)
+        public BeatWave1D(IEffectHelper effectHelper, int width, int height) : base(width, height)
         {
 			/*	Save the effect helper in your class, you will need it. */
             _helper = effectHelper;
@@ -73,24 +74,28 @@ namespace Audectra.Extensions.Effects
 			to specify what exactly is configureable. In this method you will specify
 			what controls you request from Audectra for the layer settings side panel
 			of your effect. This method generally only gets called once per layer. */
-        public override void GenerateSettings(ILayerSettingsPanel settingsPanel)
+        public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
         {
+			settingsBuilder.PageBegin();
+
 			/*	Add a bindable trackbar for the wave speed. */
-			settingsPanel.GroupBegin("Speed");
-			settingsPanel.AddBindableTrackbar(this, (float)_waveSimulation.Speed, 1.0f, 4.0f, (uint) ValueId.WaveSpeed);
-			settingsPanel.GroupEnd();
+			settingsBuilder.GroupBegin("Speed");
+			settingsBuilder.AddBindableSlider(this, (float)_waveSimulation.Speed, 1.0f, 4.0f, (uint) SettingId.WaveSpeed);
+			settingsBuilder.GroupEnd();
+
+			settingsBuilder.PageEnd();
         }
 
 		/*	Every time a configuration option you've secified above has changed, either
 			due user interaction in the layer settings or due a feature binding, this 
 			method will be called, to inform you on which of your values has changed. */
-        public override void ValueChanged(uint valueId, object value)
+        public override void OnSettingChanged(uint settingId, object value)
         {
-			switch ((ValueId)valueId)
+			switch ((SettingId)settingId)
 			{
 				/*	The wave speed has been changed either by the user or a binding. Use the
 					effect helper to convert the value to a single. */
-				case ValueId.WaveSpeed:
+				case SettingId.WaveSpeed:
 					_waveSimulation.Speed = _helper.ValueToSingle(value);
 					break;
 			}
@@ -105,7 +110,7 @@ namespace Audectra.Extensions.Effects
 		/*	Return the version of this effect. */
         public string GetVersion()
         {
-            return "v1.0.1";
+            return "v1.1.0";
         }
 
 		/*	Return the author of this effect. */
