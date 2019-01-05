@@ -5,9 +5,11 @@
 
 using System;
 
-using Audectra.Gui;
 using Audectra.Graphics;
-using Audectra.Graphics.Effects;
+using Audectra.Layers;
+using Audectra.Layers.Effects;
+using Audectra.Layers.Settings;
+
 
 namespace Audectra.Extensions.Effects
 {
@@ -28,7 +30,7 @@ namespace Audectra.Extensions.Effects
 
         public Stroboscope() { }
 
-        public Stroboscope(IEffectHelper effectHelper, int height, int width) : base(height, width)
+        public Stroboscope(IEffectHelper effectHelper, int width, int height) : base(width, height)
         {
             _helper = effectHelper;
             _color = new RgbColor(0, 0, 0);
@@ -47,23 +49,27 @@ namespace Audectra.Extensions.Effects
                 _color = _color * (1f - _flashDuration / MaxFlashDuration);
             }
 
-            _render.Map((color, x, y) => _color);
+            _render.Map((x, y) => _color);
             return _render;
         }
 
-        public override void GenerateSettings(ILayerSettingsPanel settingsPanel)
+        public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
         {
-            settingsPanel.GroupBegin("Trigger");
-            settingsPanel.AddBindableTrigger(this, (uint)TriggerId.Flash);
-            settingsPanel.GroupEnd();
+            settingsBuilder.PageBegin();
+
+            settingsBuilder.GroupBegin("Trigger");
+            settingsBuilder.AddBindableTrigger(this, (uint)TriggerId.Flash);
+            settingsBuilder.GroupEnd();
+
+            settingsBuilder.PageEnd();
         }
 
-        public override void ValueChanged(uint valueId, object value)
+        public override void OnSettingChanged(uint settingId, object value)
         {
             
         }
 
-        public override void Trigger(uint triggerId, bool risingEdge)
+        public override void OnTrigger(uint triggerId, bool risingEdge)
         {
             switch ((TriggerId) triggerId)
             {
@@ -84,7 +90,7 @@ namespace Audectra.Extensions.Effects
 
         public string GetVersion()
         {
-            return "v1.0.1";
+            return "v1.1.0";
         }
 
         public string GetAuthor()

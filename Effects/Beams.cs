@@ -7,10 +7,12 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-using Audectra.Gui;
 using Audectra.Graphics;
-using Audectra.Graphics.Effects;
 using Audectra.Graphics.Particles;
+using Audectra.Layers;
+using Audectra.Layers.Effects;
+using Audectra.Layers.Settings;
+
 
 namespace Audectra.Extensions.Effects
 {
@@ -27,7 +29,7 @@ namespace Audectra.Extensions.Effects
         private const float MaxParticleSpeed = 100f;
         private const float MaxParticleSize = 16f;
 
-        private enum ValueId
+        private enum SettingId
         {
             ColorValue = 0,
             ParticleSpeedValue,
@@ -41,7 +43,7 @@ namespace Audectra.Extensions.Effects
 
         public Beams() { }
 
-        public Beams(IEffectHelper effectHelper, int height, int width) : base(height, width)
+        public Beams(IEffectHelper effectHelper, int width, int height) : base(width, height)
         {
             _helper = effectHelper;
             _render = _helper.CreateRender();
@@ -61,44 +63,47 @@ namespace Audectra.Extensions.Effects
             return _render;
         }
 
-        public override void GenerateSettings(ILayerSettingsPanel settingsPanel)
+        public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
         {
-            settingsPanel.AddColorGroup(this, _color, (uint)ValueId.ColorValue);
+            settingsBuilder.PageBegin();
+            settingsBuilder.AddColorGroup(this, _color, (uint)SettingId.ColorValue);
 
-            settingsPanel.GroupBegin("Speed");
-            settingsPanel.AddBindableTrackbar(this, _particleSpeed, 0, MaxParticleSpeed, (uint)ValueId.ParticleSpeedValue);
-            settingsPanel.GroupEnd();
+            settingsBuilder.GroupBegin("Speed");
+            settingsBuilder.AddBindableSlider(this, _particleSpeed, 0, MaxParticleSpeed, (uint)SettingId.ParticleSpeedValue);
+            settingsBuilder.GroupEnd();
 
-            settingsPanel.GroupBegin("Size");
-            settingsPanel.AddTrackbar(this, _particleSize, 0, MaxParticleSize, (uint)ValueId.ParticleSizeValue);
-            settingsPanel.GroupEnd();
+            settingsBuilder.GroupBegin("Size");
+            settingsBuilder.AddSlider(this, _particleSize, 0, MaxParticleSize, (uint)SettingId.ParticleSizeValue);
+            settingsBuilder.GroupEnd();
 
-            settingsPanel.GroupBegin("Trigger");
-            settingsPanel.AddBindableTrigger(this, (uint)TriggerId.BeamMeUp);
-            settingsPanel.GroupEnd();
+            settingsBuilder.GroupBegin("Trigger");
+            settingsBuilder.AddBindableTrigger(this, (uint)TriggerId.BeamMeUp);
+            settingsBuilder.GroupEnd();
+
+            settingsBuilder.PageEnd();
         }
 
-        public override void ValueChanged(uint valueId, object value)
+        public override void OnSettingChanged(uint settingId, object value)
         {
-            switch ((ValueId) valueId)
+            switch ((SettingId) settingId)
             {
-                case ValueId.ColorValue:
+                case SettingId.ColorValue:
                     _color = _helper.ValueToColor(value);
                     break;
 
-                case ValueId.ParticleSpeedValue:
+                case SettingId.ParticleSpeedValue:
                     _particleSpeed = _helper.ValueToSingle(value);
                     break;
 
-                case ValueId.ParticleSizeValue:
+                case SettingId.ParticleSizeValue:
                     _particleSize = _helper.ValueToSingle(value);
                     break;
             }
         }
 
-        public override void Trigger(uint triggerId, bool enable)
+        public override void OnTrigger(uint triggerId, bool risingEdge)
         {
-            if (!enable)
+            if (!risingEdge)
                 return;
 
             switch ((TriggerId) triggerId)
@@ -129,7 +134,7 @@ namespace Audectra.Extensions.Effects
 
         public string GetVersion()
         {
-            return "v1.0.0";
+            return "v1.1.0";
         }
 
         public string GetAuthor()

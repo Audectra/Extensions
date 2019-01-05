@@ -7,10 +7,12 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-using Audectra.Gui;
 using Audectra.Graphics;
-using Audectra.Graphics.Effects;
 using Audectra.Graphics.Particles;
+using Audectra.Layers;
+using Audectra.Layers.Effects;
+using Audectra.Layers.Settings;
+
 
 namespace Audectra.Extensions.Effects
 {
@@ -41,7 +43,7 @@ namespace Audectra.Extensions.Effects
 
         public Sparkles() { }
 
-        public Sparkles(IEffectHelper effectHelper, int height, int width) : base(height, width)
+        public Sparkles(IEffectHelper effectHelper, int width, int height) : base(width, height)
         {
             _helper = effectHelper;
 
@@ -65,24 +67,27 @@ namespace Audectra.Extensions.Effects
             return _render;
         }
 
-        public override void GenerateSettings(ILayerSettingsPanel settingsPanel)
+        public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
         {
-            settingsPanel.AddColorGroup(this, _color, (uint)ValueId.ColorValue);
+            settingsBuilder.PageBegin();
+            settingsBuilder.AddColorGroup(this, _color, (uint)ValueId.ColorValue);
 
-            settingsPanel.GroupBegin("Quantity");
-            settingsPanel.AddBindableTrackbar(this, _numParticles, 0, Width, (uint)ValueId.ParticleQuantityValue);
-            settingsPanel.GroupEnd();
+            settingsBuilder.GroupBegin("Quantity");
+            settingsBuilder.AddBindableSlider(this, _numParticles, 0, Width, (uint)ValueId.ParticleQuantityValue);
+            settingsBuilder.GroupEnd();
 
-            settingsPanel.GroupBegin("Size");
-            settingsPanel.AddTrackbar(this, _particleSize, 1, MaxParticleSize, (uint)ValueId.ParticleSizeValue);
-            settingsPanel.GroupEnd();
+            settingsBuilder.GroupBegin("Size");
+            settingsBuilder.AddSlider(this, _particleSize, 1, MaxParticleSize, (uint)ValueId.ParticleSizeValue);
+            settingsBuilder.GroupEnd();
 
-            settingsPanel.GroupBegin("Trigger");
-            settingsPanel.AddBindableTrigger(this, (uint)TriggerId.Sparkle);
-            settingsPanel.GroupEnd();
+            settingsBuilder.GroupBegin("Trigger");
+            settingsBuilder.AddBindableTrigger(this, (uint)TriggerId.Sparkle);
+            settingsBuilder.GroupEnd();
+
+            settingsBuilder.PageEnd();
         }
 
-        public override void ValueChanged(uint valueId, object value)
+        public override void OnSettingChanged(uint valueId, object value)
         {
             switch ((ValueId) valueId)
             {
@@ -100,9 +105,9 @@ namespace Audectra.Extensions.Effects
             }
         }
 
-        public override void Trigger(uint triggerId, bool enable)
+        public override void OnTrigger(uint triggerId, bool risingEdge)
         {
-            if (!enable)
+            if (!risingEdge)
                 return;
 
             switch ((TriggerId) triggerId)
@@ -138,7 +143,7 @@ namespace Audectra.Extensions.Effects
 
         public string GetVersion()
         {
-            return "v1.0.0";
+            return "v1.1.0";
         }
 
         public string GetAuthor()

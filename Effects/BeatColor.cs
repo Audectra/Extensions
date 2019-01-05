@@ -5,9 +5,11 @@
 
 using System;
 
-using Audectra.Gui;
 using Audectra.Graphics;
-using Audectra.Graphics.Effects;
+using Audectra.Layers;
+using Audectra.Layers.Effects;
+using Audectra.Layers.Settings;
+
 
 /* Your effects need to be in this namesapce. */
 namespace Audectra.Extensions.Effects
@@ -23,7 +25,7 @@ namespace Audectra.Extensions.Effects
         public BeatColor() { }
 
 		/*	This constructor will be called when a layer of your effect is being created. */
-        public BeatColor(IEffectHelper effectHelper, int height, int width) : base(height, width)
+        public BeatColor(IEffectHelper effectHelper, int width, int height) : base(width, height)
         {
 			/*	Save the effect helper in your class, you will need it. */
             _helper = effectHelper;
@@ -46,7 +48,7 @@ namespace Audectra.Extensions.Effects
             }
 			
 			/* 	Map every pixel in the render to the configured color */
-            _render.Map((color, x, y) => _color);
+            _render.Map((x, y) => _color);
             return _render;
         }
 
@@ -54,7 +56,7 @@ namespace Audectra.Extensions.Effects
 			to specify what exactly is configureable. In this method you will specify
 			what controls you request from Audectra for the layer settings side panel
 			of your effect. This method generally only gets called once per layer. */
-        public override void GenerateSettings(ILayerSettingsPanel settingsPanel)
+        public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
         {
 			/* This effect extension doesn't need any additional settings so far. */
         }
@@ -62,7 +64,7 @@ namespace Audectra.Extensions.Effects
 		/*	Every time a configuration option you've secified above has changed, either
 			due user interaction in the layer settings or due a feature binding, this 
 			method will be called, to inform you on which of your values has changed. */
-        public override void ValueChanged(uint valueId, object value)
+        public override void OnSettingChanged(uint settingId, object value)
         {
 			
         }
@@ -76,7 +78,7 @@ namespace Audectra.Extensions.Effects
 		/*	Return the version of this effect. */
         public string GetVersion()
         {
-            return "v1.0.2";
+            return "v1.1.0";
         }
 
 		/*	Return the author of this effect. */
