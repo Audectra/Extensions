@@ -37,7 +37,7 @@ namespace Audectra.Extensions.Effects
             _color = new RgbColor(0, 0.5f, 0.5f);
             _render = _helper.CreateRender();
 
-            _threshold = 0.5f;
+            _threshold = 0.0f;
             _barSize = (int)(width / NumBars);
         }
 
