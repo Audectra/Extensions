@@ -64,7 +64,7 @@ namespace Audectra.Extensions.Effects
             settingsBuilder.PageEnd();
         }
 
-        public override void OnSettingChanged(uint settingId, object value)
+        public override void OnSettingChanged(uint settingId, SettingValue value)
         {
             
         }
@@ -90,7 +90,7 @@ namespace Audectra.Extensions.Effects
 
         public string GetVersion()
         {
-            return "v1.1.0";
+            return "v1.2.0";
         }
 
         public string GetAuthor()

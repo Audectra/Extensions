@@ -126,18 +126,18 @@ namespace Audectra.Extensions.Effects
             settingsBuilder.PageEnd();
         }
 
-        public override void OnSettingChanged(uint settingId, object value)
+        public override void OnSettingChanged(uint settingId, SettingValue value)
         {
             switch ((SettingId) settingId)
             {
                 case SettingId.Color:
-                    _color = _helper.ValueToColor(value);
+                    _color = value;
                     break;
 
                 case SettingId.NumBars:
                     lock (_barsLock)
                     {
-                        _numBars = _helper.ValueToInt(value);
+                        _numBars = value;
                         _barSize = (int)(Width / _numBars);
                         _lastBar = -1;
                         InitBars();
@@ -147,7 +147,7 @@ namespace Audectra.Extensions.Effects
                 case SettingId.MaxBarLife:
                     lock (_barsLock)
                     {
-                        _maxBarLife = _helper.ValueToSingle(value);
+                        _maxBarLife = value;
                     }
                     break;
             }
@@ -168,7 +168,7 @@ namespace Audectra.Extensions.Effects
                     {
                         _bars[idxBar].Value = _maxBarLife;
                         _bars[idxBar].MaxLife = _maxBarLife;
-                        _bars[idxBar].Color = _color.Copy();
+                        _bars[idxBar].Color = _color;
                     }
                 }
                 break;
@@ -195,7 +195,7 @@ namespace Audectra.Extensions.Effects
 
         public string GetVersion()
         {
-            return "v1.1.0";
+            return "v1.2.0";
         }
 
         public string GetAuthor()

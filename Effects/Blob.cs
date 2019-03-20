@@ -87,28 +87,28 @@ namespace Audectra.Extensions.Effects
             settingsBuilder.PageEnd();
         }
 
-        public override void OnSettingChanged(uint settingId, object value)
+        public override void OnSettingChanged(uint settingId, SettingValue value)
         {
             switch ((SettingId) settingId)
             {
                 case SettingId.ColorValue:
-                    _color = _helper.ValueToColor(value);
+                    _color = value;
                     break;
 
                 case SettingId.XPositionValue:
-                    _x0Pos = _helper.ValueToSingle(value);
+                    _x0Pos = value;
                     break;
 
                 case SettingId.YPositionValue:
-                    _y0Pos = _helper.ValueToSingle(value);
+                    _y0Pos = value;
                     break;
 
                 case SettingId.XSizeValue:
-                    _xSize = _helper.ValueToSingle(value);
+                    _xSize = value;
                     break;
 
                 case SettingId.YSizeValue:
-                    _ySize = _helper.ValueToSingle(value);
+                    _ySize = value;
                     break;
             }
         }
@@ -120,7 +120,7 @@ namespace Audectra.Extensions.Effects
 
         public string GetVersion()
         {
-            return "v1.1.0";
+            return "v1.2.0";
         }
 
         public string GetAuthor()

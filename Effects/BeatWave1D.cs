@@ -89,14 +89,14 @@ namespace Audectra.Extensions.Effects
 		/*	Every time a configuration option you've secified above has changed, either
 			due user interaction in the layer settings or due a feature binding, this 
 			method will be called, to inform you on which of your values has changed. */
-        public override void OnSettingChanged(uint settingId, object value)
+        public override void OnSettingChanged(uint settingId, SettingValue value)
         {
 			switch ((SettingId)settingId)
 			{
 				/*	The wave speed has been changed either by the user or a binding. Use the
 					effect helper to convert the value to a single. */
 				case SettingId.WaveSpeed:
-					_waveSimulation.Speed = _helper.ValueToSingle(value);
+					_waveSimulation.Speed = value;
 					break;
 			}
         }
@@ -110,7 +110,7 @@ namespace Audectra.Extensions.Effects
 		/*	Return the version of this effect. */
         public string GetVersion()
         {
-            return "v1.1.0";
+            return "v1.2.0";
         }
 
 		/*	Return the author of this effect. */

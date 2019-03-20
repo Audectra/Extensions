@@ -87,20 +87,20 @@ namespace Audectra.Extensions.Effects
             settingsBuilder.PageEnd();
         }
 
-        public override void OnSettingChanged(uint valueId, object value)
+        public override void OnSettingChanged(uint valueId, SettingValue value)
         {
             switch ((ValueId) valueId)
             {
                 case ValueId.ColorValue:
-                    _color = _helper.ValueToColor(value);
+                    _color = value;
                     break;
 
                 case ValueId.ParticleQuantityValue:
-                    _numParticles = _helper.ValueToSingle(value);
+                    _numParticles = value;
                     break;
 
                 case ValueId.ParticleSizeValue:
-                    _particleSize = _helper.ValueToSingle(value);
+                    _particleSize = value;
                     break;
             }
         }
@@ -143,7 +143,7 @@ namespace Audectra.Extensions.Effects
 
         public string GetVersion()
         {
-            return "v1.1.0";
+            return "v1.2.0";
         }
 
         public string GetAuthor()

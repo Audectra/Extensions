@@ -122,38 +122,38 @@ namespace Audectra.Extensions.Effects
             settingsBuilder.PageEnd();
         }
 
-        public override void OnSettingChanged(uint settingId, object value)
+        public override void OnSettingChanged(uint settingId, SettingValue value)
         {
             switch ((SettingId) settingId)
             {
                 case SettingId.BeginColorValue:
                     _particleEmitters.ForEach(emitter => 
-                        emitter.BeginConfig.SetColor(_helper.ValueToColor(value)));
+                        emitter.BeginConfig.SetColor(value));
                     break;
 
                 case SettingId.EmissionRateValue:
                     _particleEmitters.ForEach(emitter => 
-                        emitter.SetEmissionRate(_helper.ValueToSingle(value)));
+                        emitter.SetEmissionRate(value));
                     break;
 
                 case SettingId.ParticleSpeedValue:
                     _particleEmitters.ForEach(emitter => 
-                        emitter.SetSpeed(_helper.ValueToSingle(value)));
+                        emitter.SetSpeed(value));
                     break;
 
                 case SettingId.ParticleLifeValue:
                     _particleEmitters.ForEach(emitter => 
-                        emitter.SetLife(_helper.ValueToSingle(value)));
+                        emitter.SetLife(value));
                     break;
 
                 case SettingId.ParticleBeginSizeValue:
                     _particleEmitters.ForEach(emitter => 
-                        emitter.BeginConfig.SetSize(_helper.ValueToSingle(value)));
+                        emitter.BeginConfig.SetSize(value));
                     break;
 
                 case SettingId.ParticleEndSizeValue:
                     _particleEmitters.ForEach(emitter => 
-                        emitter.EndConfig.SetSize(_helper.ValueToSingle(value)));
+                        emitter.EndConfig.SetSize(value));
                     break;
             }
         }
@@ -165,7 +165,7 @@ namespace Audectra.Extensions.Effects
 
         public string GetVersion()
         {
-            return "v1.1.0";
+            return "v1.2.0";
         }
 
         public string GetAuthor()

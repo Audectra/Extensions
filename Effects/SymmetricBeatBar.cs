@@ -69,12 +69,12 @@ namespace Audectra.Extensions.Effects
             settingsBuilder.PageEnd();
         }
 
-        public override void OnSettingChanged(uint settingId, object value)
+        public override void OnSettingChanged(uint settingId, SettingValue value)
         {
             switch ((SettingId) settingId)
             {
                 case SettingId.Color:
-                    _color = _helper.ValueToColor(value);
+                    _color = value;
                     break;
             }
         }
@@ -86,7 +86,7 @@ namespace Audectra.Extensions.Effects
 
         public string GetVersion()
         {
-            return "v1.1.0";
+            return "v1.2.0";
         }
 
         public string GetAuthor()
