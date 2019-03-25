@@ -9,7 +9,7 @@ using Audectra.Graphics;
 using Audectra.Layers;
 using Audectra.Layers.Effects;
 using Audectra.Layers.Settings;
-
+using Audectra.Layers.Requirements;
 
 namespace Audectra.Extensions.Effects
 {
@@ -62,6 +62,11 @@ namespace Audectra.Extensions.Effects
             _helper.AddBlob(_render, _x0Pos, _y0Pos, _xSize, _ySize, _color);
 
             return _render;
+        }
+
+        public override void GenerateRequirements(ILayerRequirementsBuilder reqBuilder)
+        {
+            reqBuilder.AddMinimumNumberOfPixels(8);
         }
 
         public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)

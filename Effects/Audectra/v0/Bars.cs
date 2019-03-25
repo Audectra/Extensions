@@ -10,6 +10,7 @@ using Audectra.Graphics;
 using Audectra.Layers;
 using Audectra.Layers.Effects;
 using Audectra.Layers.Settings;
+using Audectra.Layers.Requirements;
 
 namespace Audectra.Extensions.Effects
 {
@@ -104,6 +105,12 @@ namespace Audectra.Extensions.Effects
                 if (_bars[i].Value < 0)
                     _bars[i].Value = 0;
             }
+        }
+
+        public override void GenerateRequirements(ILayerRequirementsBuilder reqBuilder)
+        {
+            reqBuilder.AddMinimumWidth(4);
+            reqBuilder.AddLandscapeAspectRatio();
         }
 
         public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)

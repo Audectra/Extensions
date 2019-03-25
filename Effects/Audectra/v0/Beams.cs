@@ -12,50 +12,46 @@ using Audectra.Graphics.Particles;
 using Audectra.Layers;
 using Audectra.Layers.Effects;
 using Audectra.Layers.Settings;
-
+using Audectra.Layers.Requirements;
 
 namespace Audectra.Extensions.Effects
 {
-    class Sparkles : EffectBase, IExtension
+    class Beams : EffectBase, IExtension
     {
         private readonly IEffectHelper _helper;
         private readonly IRgbRender _render;
 
         private RgbColor _color;
-        private float _numParticles;
+        private float _particleSpeed;
         private float _particleSize;
         private readonly IParticleSystem _particleSystem;
 
-        private const float MaxParticleLife = 0.25f;
-        private const float MaxParticleSize = 8f;
+        private const float MaxParticleSpeed = 100f;
+        private const float MaxParticleSize = 16f;
 
-        private enum ValueId
+        private enum SettingId
         {
             ColorValue = 0,
-            ParticleQuantityValue,
+            ParticleSpeedValue,
             ParticleSizeValue
         }
 
         private enum TriggerId
         {
-            Sparkle = 0,
+            BeamMeUp = 0,
         }
 
-        public Sparkles() { }
+        public Beams() { }
 
-        public Sparkles(IEffectHelper effectHelper, int width, int height) : base(width, height)
+        public Beams(IEffectHelper effectHelper, int width, int height) : base(width, height)
         {
             _helper = effectHelper;
-
-            // Create a render for this effect instance once.
             _render = _helper.CreateRender();
-
-            // Create a particle system
             _particleSystem = _helper.CreateParticleSystem();
 
             _color = new RgbColor(0.0f, 0.5f, 0.5f);
-            _numParticles = 3 * Width / 4;
-            _particleSize = 1;
+            _particleSpeed = 5;
+            _particleSize = 4;
         }
 
         public override IRgbRender Render(float dt)
@@ -67,39 +63,45 @@ namespace Audectra.Extensions.Effects
             return _render;
         }
 
+        public override void GenerateRequirements(ILayerRequirementsBuilder reqBuilder)
+        {
+            reqBuilder.AddMinimumWidth(8);
+            reqBuilder.AddLandscapeAspectRatio();
+        }
+
         public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
         {
             settingsBuilder.PageBegin();
-            settingsBuilder.AddColorGroup(this, _color, (uint)ValueId.ColorValue);
+            settingsBuilder.AddColorGroup(this, _color, (uint)SettingId.ColorValue);
 
-            settingsBuilder.GroupBegin("Quantity");
-            settingsBuilder.AddBindableSlider(this, _numParticles, 0, Width, (uint)ValueId.ParticleQuantityValue);
+            settingsBuilder.GroupBegin("Speed");
+            settingsBuilder.AddBindableSlider(this, _particleSpeed, 0, MaxParticleSpeed, (uint)SettingId.ParticleSpeedValue);
             settingsBuilder.GroupEnd();
 
             settingsBuilder.GroupBegin("Size");
-            settingsBuilder.AddSlider(this, _particleSize, 1, MaxParticleSize, (uint)ValueId.ParticleSizeValue);
+            settingsBuilder.AddSlider(this, _particleSize, 0, MaxParticleSize, (uint)SettingId.ParticleSizeValue);
             settingsBuilder.GroupEnd();
 
             settingsBuilder.GroupBegin("Trigger");
-            settingsBuilder.AddBindableTrigger(this, (uint)TriggerId.Sparkle);
+            settingsBuilder.AddBindableTrigger(this, (uint)TriggerId.BeamMeUp);
             settingsBuilder.GroupEnd();
 
             settingsBuilder.PageEnd();
         }
 
-        public override void OnSettingChanged(uint valueId, SettingValue value)
+        public override void OnSettingChanged(uint settingId, SettingValue value)
         {
-            switch ((ValueId) valueId)
+            switch ((SettingId) settingId)
             {
-                case ValueId.ColorValue:
+                case SettingId.ColorValue:
                     _color = value;
                     break;
 
-                case ValueId.ParticleQuantityValue:
-                    _numParticles = value;
+                case SettingId.ParticleSpeedValue:
+                    _particleSpeed = value;
                     break;
 
-                case ValueId.ParticleSizeValue:
+                case SettingId.ParticleSizeValue:
                     _particleSize = value;
                     break;
             }
@@ -112,33 +114,28 @@ namespace Audectra.Extensions.Effects
 
             switch ((TriggerId) triggerId)
             {
-                case TriggerId.Sparkle:
-                    var rand = new Random();
-
-                    for (int i = 0; i < _numParticles; i++)
+                case TriggerId.BeamMeUp:
+                    var particleConfig = new ParticleConfig
                     {
-                        var particleConfig = new ParticleConfig
-                        {
-                            Angle = 0,
-                            Life = (float)(MaxParticleLife * rand.NextDouble()),
-                            Speed = 0,
-                        };
+                        Angle = 0,
+                        Life = float.MaxValue,
+                        Speed = _particleSpeed,
+                    };
 
-                        particleConfig.SetPosition((float)(Width * rand.NextDouble()), 0);
-                        particleConfig.SetAxisPosition(0, 0);
+                    particleConfig.SetPosition(0, 0);
+                    particleConfig.SetAxisPosition(0, 0);
 
-                        particleConfig.BeginConfig = new ParticleEndpoint(_particleSize, _color);
-                        particleConfig.EndConfig = new ParticleEndpoint(_particleSize, _color);
+                    particleConfig.BeginConfig = new ParticleEndpoint(_particleSize, _color);
+                    particleConfig.EndConfig = new ParticleEndpoint(_particleSize, _color);
 
-                        _particleSystem.AddParticle(particleConfig);
-                    }
+                    _particleSystem.AddParticle(particleConfig);
                     break;
             }
         }
 
         public string GetName()
         {
-            return "Sparkles";
+            return "Beams";
         }
 
         public string GetVersion()

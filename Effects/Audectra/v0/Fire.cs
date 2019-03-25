@@ -12,7 +12,7 @@ using Audectra.Graphics.Particles;
 using Audectra.Layers;
 using Audectra.Layers.Effects;
 using Audectra.Layers.Settings;
-
+using Audectra.Layers.Requirements;
 
 namespace Audectra.Extensions.Effects
 {
@@ -91,6 +91,11 @@ namespace Audectra.Extensions.Effects
             _particleSystem.Render(_render);
             
             return _render;
+        }
+
+        public override void GenerateRequirements(ILayerRequirementsBuilder reqBuilder)
+        {
+            reqBuilder.AddMinimumDimensions(8, 8);
         }
 
         public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)

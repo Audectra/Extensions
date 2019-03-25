@@ -9,6 +9,7 @@ using Audectra.Graphics;
 using Audectra.Layers;
 using Audectra.Layers.Effects;
 using Audectra.Layers.Settings;
+using Audectra.Layers.Requirements;
 using Audectra.Mathematics;
 
 /* Your effects need to be in this namesapce. */
@@ -75,6 +76,12 @@ namespace Audectra.Extensions.Effects
 			_waveSimulation.Render(_render);
 			
             return _render;
+        }
+
+		public override void GenerateRequirements(ILayerRequirementsBuilder reqBuilder)
+        {
+            reqBuilder.AddMinimumWidth(8);
+            reqBuilder.AddLandscapeAspectRatio();
         }
 		
 		/*	To allow the user to configure your effect to their likings, you will need 

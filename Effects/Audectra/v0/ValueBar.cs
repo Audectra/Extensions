@@ -9,7 +9,7 @@ using Audectra.Graphics;
 using Audectra.Layers;
 using Audectra.Layers.Effects;
 using Audectra.Layers.Settings;
-
+using Audectra.Layers.Requirements;
 
 namespace Audectra.Extensions.Effects
 {
@@ -44,6 +44,12 @@ namespace Audectra.Extensions.Effects
             _helper.FillBar(_render, 0, (int)(Width * _barValue), _color);
 
             return _render;
+        }
+
+        public override void GenerateRequirements(ILayerRequirementsBuilder reqBuilder)
+        {
+            reqBuilder.AddMinimumWidth(4);
+            reqBuilder.AddLandscapeAspectRatio();
         }
 
         public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
