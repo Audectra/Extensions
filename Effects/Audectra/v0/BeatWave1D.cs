@@ -87,7 +87,7 @@ namespace Audectra.Extensions.Effects
 
 			/*	Add a bindable trackbar for the wave speed. */
 			settingsBuilder.GroupBegin("Speed");
-			settingsBuilder.AddBindableSlider(this, (float)_waveSimulation.Speed, 1.0f, 4.0f, (uint) SettingId.WaveSpeed);
+			settingsBuilder.AddBindableSlider((float)_waveSimulation.Speed, 1.0f, 4.0f, (uint) SettingId.WaveSpeed);
 			settingsBuilder.GroupEnd();
 
 			settingsBuilder.PageEnd();
@@ -117,7 +117,7 @@ namespace Audectra.Extensions.Effects
 		/*	Return the version of this effect. */
         public string GetVersion()
         {
-            return "v1.2.0";
+            return "v1.3.0";
         }
 
 		/*	Return the author of this effect. */

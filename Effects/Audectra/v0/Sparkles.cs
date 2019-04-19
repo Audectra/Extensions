@@ -75,18 +75,18 @@ namespace Audectra.Extensions.Effects
         public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
         {
             settingsBuilder.PageBegin();
-            settingsBuilder.AddColorGroup(this, _color, (uint)ValueId.ColorValue);
+            settingsBuilder.AddColorGroup(_color, (uint)ValueId.ColorValue);
 
             settingsBuilder.GroupBegin("Quantity");
-            settingsBuilder.AddBindableSlider(this, _numParticles, 0, Width, (uint)ValueId.ParticleQuantityValue);
+            settingsBuilder.AddBindableSlider(_numParticles, 0, Width, (uint)ValueId.ParticleQuantityValue);
             settingsBuilder.GroupEnd();
 
             settingsBuilder.GroupBegin("Size");
-            settingsBuilder.AddSlider(this, _particleSize, 1, MaxParticleSize, (uint)ValueId.ParticleSizeValue);
+            settingsBuilder.AddSlider(_particleSize, 1, MaxParticleSize, (uint)ValueId.ParticleSizeValue);
             settingsBuilder.GroupEnd();
 
             settingsBuilder.GroupBegin("Trigger");
-            settingsBuilder.AddBindableTrigger(this, (uint)TriggerId.Sparkle);
+            settingsBuilder.AddBindableTrigger((uint)TriggerId.Sparkle);
             settingsBuilder.GroupEnd();
 
             settingsBuilder.PageEnd();
@@ -151,7 +151,7 @@ namespace Audectra.Extensions.Effects
 
         public string GetVersion()
         {
-            return "v1.2.0";
+            return "v1.3.0";
         }
 
         public string GetAuthor()

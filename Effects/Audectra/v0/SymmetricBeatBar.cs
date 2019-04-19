@@ -71,7 +71,7 @@ namespace Audectra.Extensions.Effects
         public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
         {
             settingsBuilder.PageBegin();
-            settingsBuilder.AddColorGroup(this, _color, (uint)SettingId.Color);
+            settingsBuilder.AddColorGroup(_color, (uint)SettingId.Color);
             settingsBuilder.PageEnd();
         }
 
@@ -92,7 +92,7 @@ namespace Audectra.Extensions.Effects
 
         public string GetVersion()
         {
-            return "v1.2.0";
+            return "v1.3.0";
         }
 
         public string GetAuthor()

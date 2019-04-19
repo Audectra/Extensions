@@ -72,21 +72,21 @@ namespace Audectra.Extensions.Effects
         public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
         {
             settingsBuilder.PageBegin();
-            settingsBuilder.AddColorGroup(this, _color, (uint)SettingId.ColorValue);
+            settingsBuilder.AddColorGroup(_color, (uint)SettingId.ColorValue);
 
             settingsBuilder.GroupBegin("Position");
-            settingsBuilder.AddSlider(this, _x0Pos, 0, Width, (uint)SettingId.XPositionValue);
+            settingsBuilder.AddSlider(_x0Pos, 0, Width, (uint)SettingId.XPositionValue);
 
             if (Height > 1)
-                settingsBuilder.AddSlider(this, _y0Pos, 0, Height, (uint)SettingId.YPositionValue);
+                settingsBuilder.AddSlider(_y0Pos, 0, Height, (uint)SettingId.YPositionValue);
 
             settingsBuilder.GroupEnd();
 
             settingsBuilder.GroupBegin("Size");
-            settingsBuilder.AddBindableSlider(this, _xSize, 0, Width, (uint)SettingId.XSizeValue);
+            settingsBuilder.AddBindableSlider(_xSize, 0, Width, (uint)SettingId.XSizeValue);
 
             if (Height > 1)
-                settingsBuilder.AddBindableSlider(this, _ySize, 0, Height, (uint) SettingId.YSizeValue);
+                settingsBuilder.AddBindableSlider(_ySize, 0, Height, (uint) SettingId.YSizeValue);
 
             settingsBuilder.GroupEnd();
             settingsBuilder.PageEnd();
@@ -125,7 +125,7 @@ namespace Audectra.Extensions.Effects
 
         public string GetVersion()
         {
-            return "v1.2.0";
+            return "v1.3.0";
         }
 
         public string GetAuthor()

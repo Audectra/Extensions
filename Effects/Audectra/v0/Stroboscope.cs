@@ -58,7 +58,7 @@ namespace Audectra.Extensions.Effects
             settingsBuilder.PageBegin();
 
             settingsBuilder.GroupBegin("Trigger");
-            settingsBuilder.AddBindableTrigger(this, (uint)TriggerId.Flash);
+            settingsBuilder.AddBindableTrigger((uint)TriggerId.Flash);
             settingsBuilder.GroupEnd();
 
             settingsBuilder.PageEnd();
@@ -90,7 +90,7 @@ namespace Audectra.Extensions.Effects
 
         public string GetVersion()
         {
-            return "v1.2.0";
+            return "v1.3.0";
         }
 
         public string GetAuthor()

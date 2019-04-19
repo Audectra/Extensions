@@ -61,7 +61,7 @@ namespace Audectra.Extensions.Effects
 		/*	Return the version of this effect. */
         public string GetVersion()
         {
-            return "v1.2.0";
+            return "v1.3.0";
         }
 
 		/*	Return the author of this effect. */

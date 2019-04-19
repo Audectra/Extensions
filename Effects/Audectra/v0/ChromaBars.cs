@@ -71,10 +71,10 @@ namespace Audectra.Extensions.Effects
         public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
         {
             settingsBuilder.PageBegin();
-            settingsBuilder.AddColorGroup(this, _color, (uint)SettingId.Color);
+            settingsBuilder.AddColorGroup(_color, (uint)SettingId.Color);
 
             settingsBuilder.GroupBegin("Threshold");
-            settingsBuilder.AddSlider(this, _threshold, 0, 1, (uint)SettingId.ThresholdValue);
+            settingsBuilder.AddSlider(_threshold, 0, 1, (uint)SettingId.ThresholdValue);
             settingsBuilder.GroupEnd();
 
             settingsBuilder.PageEnd();
@@ -101,7 +101,7 @@ namespace Audectra.Extensions.Effects
 
         public string GetVersion()
         {
-            return "v1.2.0";
+            return "v1.3.0";
         }
 
         public string GetAuthor()

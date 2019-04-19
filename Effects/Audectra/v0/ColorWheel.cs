@@ -70,11 +70,11 @@ namespace Audectra.Extensions.Effects
             settingsBuilder.PageBegin();
 
             settingsBuilder.GroupBegin("Scale");
-            settingsBuilder.AddSlider(this, _scale, MinScale, MaxScale, (uint)SettingId.Scale);
+            settingsBuilder.AddSlider(_scale, MinScale, MaxScale, (uint)SettingId.Scale);
             settingsBuilder.GroupEnd();
 
             settingsBuilder.GroupBegin("Speed");
-            settingsBuilder.AddBindableSlider(this, _speed, 0, MaxSpeed, (uint)SettingId.Speed);
+            settingsBuilder.AddBindableSlider(_speed, 0, MaxSpeed, (uint)SettingId.Speed);
             settingsBuilder.GroupEnd();
 
             settingsBuilder.PageEnd();
@@ -101,7 +101,7 @@ namespace Audectra.Extensions.Effects
 
         public string GetVersion()
         {
-            return "v1.2.0";
+            return "v1.3.0";
         }
 
         public string GetAuthor()

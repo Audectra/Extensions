@@ -94,16 +94,16 @@ namespace Audectra.Extensions.Effects
 
 			/* 	Add a color group to the layer settings of this effect, such that
 				the user is able to choose or bind a color. */
-            settingsBuilder.AddColorGroup(this, _color, (uint) ValueId.ColorValue);
+            settingsBuilder.AddColorGroup(_color, (uint) ValueId.ColorValue);
 			
 			/*	Add a bindable trackbar for the wave speed. */
 			settingsBuilder.GroupBegin("Speed");
-			settingsBuilder.AddBindableSlider(this, (float)_waveSimulation.Speed, 1.0f, 4.0f, (uint) ValueId.WaveSpeed);
+			settingsBuilder.AddBindableSlider((float)_waveSimulation.Speed, 1.0f, 4.0f, (uint) ValueId.WaveSpeed);
 			settingsBuilder.GroupEnd();
 			
 			/*	Add a trigger for the AddDrop trigger id to the settings group */
 			settingsBuilder.GroupBegin("Droplet");
-			settingsBuilder.AddBindableTrigger(this, (uint) TriggerId.AddDrop);
+			settingsBuilder.AddBindableTrigger((uint) TriggerId.AddDrop);
 			settingsBuilder.GroupEnd();
 
 			settingsBuilder.PageEnd();
@@ -154,7 +154,7 @@ namespace Audectra.Extensions.Effects
 		/*	Return the version of this effect. */
         public string GetVersion()
         {
-            return "v1.2.0";
+            return "v1.3.0";
         }
 
 		/*	Return the author of this effect. */

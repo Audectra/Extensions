@@ -63,7 +63,7 @@ namespace Audectra.Extensions.Effects
 			
             /* 	Add a color group to the layer settings of this effect, such that
 				the user is able to choose or bind a color. */
-            settingsBuilder.AddColorGroup(this, _color, (uint) SettingId.ColorValue);
+            settingsBuilder.AddColorGroup(_color, (uint) SettingId.ColorValue);
             
             settingsBuilder.PageEnd();
         }
@@ -88,7 +88,7 @@ namespace Audectra.Extensions.Effects
 		/*	Return the version of this effect. */
         public string GetVersion()
         {
-            return "v1.2.0";
+            return "v1.3.0";
         }
 
 		/*	Return the author of this effect. */

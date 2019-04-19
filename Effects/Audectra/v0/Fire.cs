@@ -103,25 +103,25 @@ namespace Audectra.Extensions.Effects
             settingsBuilder.PageBegin();
 
             settingsBuilder.GroupBegin("Emission Rate");
-            settingsBuilder.AddBindableSlider(this, _particleEmitters[0].EmissionRate, 0, MaxEmissionRate, (uint)SettingId.EmissionRateValue);
+            settingsBuilder.AddBindableSlider(_particleEmitters[0].EmissionRate, 0, MaxEmissionRate, (uint)SettingId.EmissionRateValue);
             settingsBuilder.GroupEnd();
 
             settingsBuilder.GroupBegin("Velocity");
-            settingsBuilder.AddSlider(this, _particleEmitters[0].MinSpeed, 0, MaxParticleSpeed, (uint)SettingId.ParticleSpeedValue);
+            settingsBuilder.AddSlider(_particleEmitters[0].MinSpeed, 0, MaxParticleSpeed, (uint)SettingId.ParticleSpeedValue);
             settingsBuilder.GroupEnd();
 
             settingsBuilder.GroupBegin("Life");
-            settingsBuilder.AddSlider(this, _particleEmitters[0].MinLife, 0, MaxParticleLife, (uint)SettingId.ParticleLifeValue);
+            settingsBuilder.AddSlider(_particleEmitters[0].MinLife, 0, MaxParticleLife, (uint)SettingId.ParticleLifeValue);
             settingsBuilder.GroupEnd();
             
-            settingsBuilder.AddColorGroup(this, _beginColor, (uint)SettingId.BeginColorValue);
+            settingsBuilder.AddColorGroup(_beginColor, (uint)SettingId.BeginColorValue);
 
             settingsBuilder.GroupBegin("Begin Size");
-            settingsBuilder.AddSlider(this, _particleEmitters[0].BeginConfig.MinSize, 1, MaxParticleSize, (uint)SettingId.ParticleBeginSizeValue);
+            settingsBuilder.AddSlider(_particleEmitters[0].BeginConfig.MinSize, 1, MaxParticleSize, (uint)SettingId.ParticleBeginSizeValue);
             settingsBuilder.GroupEnd();
 
             settingsBuilder.GroupBegin("End Size");
-            settingsBuilder.AddSlider(this, _particleEmitters[0].EndConfig.MinSize, 0, MaxParticleSize, (uint)SettingId.ParticleEndSizeValue);
+            settingsBuilder.AddSlider(_particleEmitters[0].EndConfig.MinSize, 0, MaxParticleSize, (uint)SettingId.ParticleEndSizeValue);
             settingsBuilder.GroupEnd();
 
             settingsBuilder.PageEnd();
@@ -170,7 +170,7 @@ namespace Audectra.Extensions.Effects
 
         public string GetVersion()
         {
-            return "v1.2.0";
+            return "v1.3.0";
         }
 
         public string GetAuthor()

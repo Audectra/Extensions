@@ -116,18 +116,18 @@ namespace Audectra.Extensions.Effects
         public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
         {
             settingsBuilder.PageBegin();
-            settingsBuilder.AddColorGroup(this, _color, (uint)SettingId.Color);
+            settingsBuilder.AddColorGroup(_color, (uint)SettingId.Color);
 
             settingsBuilder.GroupBegin("Num Bars");
-            settingsBuilder.AddSlider(this, _numBars, 1, _maxNumBars, (uint)SettingId.NumBars);
+            settingsBuilder.AddSlider(_numBars, 1, _maxNumBars, (uint)SettingId.NumBars);
             settingsBuilder.GroupEnd();
 
             settingsBuilder.GroupBegin("Bar Life");
-            settingsBuilder.AddBindableSlider(this, _maxBarLife, 0, 2.5f, (uint)SettingId.MaxBarLife);
+            settingsBuilder.AddBindableSlider(_maxBarLife, 0, 2.5f, (uint)SettingId.MaxBarLife);
             settingsBuilder.GroupEnd();
 
             settingsBuilder.GroupBegin("Trigger");
-            settingsBuilder.AddBindableTrigger(this, (uint)TriggerId.BarBoom);
+            settingsBuilder.AddBindableTrigger((uint)TriggerId.BarBoom);
             settingsBuilder.GroupEnd();
             
             settingsBuilder.PageEnd();
@@ -202,7 +202,7 @@ namespace Audectra.Extensions.Effects
 
         public string GetVersion()
         {
-            return "v1.2.0";
+            return "v1.3.0";
         }
 
         public string GetAuthor()
