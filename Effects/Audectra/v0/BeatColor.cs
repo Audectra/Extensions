@@ -10,19 +10,17 @@ using Audectra.Layers;
 using Audectra.Layers.Effects;
 using Audectra.Layers.Settings;
 using Audectra.Layers.Requirements;
+using Audectra.Extensions.Sdk.V1;
 
 /* Your effects need to be in this namesapce. */
 namespace Audectra.Extensions.Effects
 {
-	/*	Implement the EffectBase base class and the IExtension interface. */
-    class BeatColor : EffectBase, IExtension
+	[EffectExtension("Beat Color", "Audectra", "1.3.0")]
+    class BeatColor : EffectExtensionBase
     {
         private IEffectHelper _helper;
         private RgbColor _color;
         private IRgbRender _render;
-		
-		/* 	This empty constructor is neccessary for Audectras extension loader engine. */
-        public BeatColor() { }
 
 		/*	This constructor will be called when a layer of your effect is being created. */
         public BeatColor(IEffectHelper effectHelper, int width, int height) : base(width, height)
@@ -50,24 +48,6 @@ namespace Audectra.Extensions.Effects
 			/* 	Map every pixel in the render to the configured color */
             _render.Map((x, y) => _color);
             return _render;
-        }
-
-		/*	Return the name of this effect. */
-        public string GetName()
-        {
-            return "Beat Color";
-        }
-
-		/*	Return the version of this effect. */
-        public string GetVersion()
-        {
-            return "v1.3.0";
-        }
-
-		/*	Return the author of this effect. */
-        public string GetAuthor()
-        {
-            return "Audectra";
         }
     }
 }

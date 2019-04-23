@@ -9,13 +9,13 @@ using Audectra.Graphics;
 using Audectra.Layers;
 using Audectra.Layers.Effects;
 using Audectra.Layers.Settings;
-
+using Audectra.Extensions.Sdk.V1;
 
 /* Your effects need to be in this namesapce. */
 namespace Audectra.Extensions.Effects
 {
-	/*	Implement the EffectBase base class and the IExtension interface. */
-    class SimpleColor : EffectBase, IExtension
+	[EffectExtension("Simple Color", "Audectra", "1.3.0")]
+    class SimpleColor : EffectExtensionBase
     {
         private IEffectHelper _helper;
         private RgbColor _color;
@@ -27,9 +27,6 @@ namespace Audectra.Extensions.Effects
 			/*	ValueId for the configurable color. */
 			ColorValue = 0,
 		}
-
-		/* 	This empty constructor is neccessary for Audectras extension loader engine. */
-        public SimpleColor() { }
 
 		/*	This constructor will be called when a layer of your effect is being created. */
         public SimpleColor(IEffectHelper effectHelper, int width, int height) : base(width, height)
@@ -77,24 +74,6 @@ namespace Audectra.Extensions.Effects
 				effect helper to convert the value to a color. */
             if ((SettingId)settingId == SettingId.ColorValue)
                 _color = value;
-        }
-
-		/*	Return the name of this effect. */
-        public string GetName()
-        {
-            return "Simple Color";
-        }
-
-		/*	Return the version of this effect. */
-        public string GetVersion()
-        {
-            return "v1.3.0";
-        }
-
-		/*	Return the author of this effect. */
-        public string GetAuthor()
-        {
-            return "Audectra";
         }
     }
 }

@@ -13,10 +13,14 @@ using Audectra.Layers;
 using Audectra.Layers.Effects;
 using Audectra.Layers.Settings;
 using Audectra.Layers.Requirements;
+using Audectra.Extensions.Sdk.V1;
 
 namespace Audectra.Extensions.Effects
 {
-    class Beams : EffectBase, IExtension
+    [MinWidthRequirement(8)]
+    [LandscapeAspectRatioRequirement()]
+    [EffectExtension("Beams", "Audectra", "1.3.0")]
+    class Beams : EffectExtensionBase
     {
         private readonly IEffectHelper _helper;
         private readonly IRgbRender _render;
@@ -41,8 +45,6 @@ namespace Audectra.Extensions.Effects
             BeamMeUp = 0,
         }
 
-        public Beams() { }
-
         public Beams(IEffectHelper effectHelper, int width, int height) : base(width, height)
         {
             _helper = effectHelper;
@@ -61,12 +63,6 @@ namespace Audectra.Extensions.Effects
             _particleSystem.Render(_render);
             
             return _render;
-        }
-
-        public override void GenerateRequirements(ILayerRequirementsBuilder reqBuilder)
-        {
-            reqBuilder.AddMinimumWidth(8);
-            reqBuilder.AddLandscapeAspectRatio();
         }
 
         public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
@@ -131,21 +127,6 @@ namespace Audectra.Extensions.Effects
                     _particleSystem.AddParticle(particleConfig);
                     break;
             }
-        }
-
-        public string GetName()
-        {
-            return "Beams";
-        }
-
-        public string GetVersion()
-        {
-            return "v1.3.0";
-        }
-
-        public string GetAuthor()
-        {
-            return "Audectra";
         }
     }
 }

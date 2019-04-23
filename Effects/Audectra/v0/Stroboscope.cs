@@ -9,11 +9,12 @@ using Audectra.Graphics;
 using Audectra.Layers;
 using Audectra.Layers.Effects;
 using Audectra.Layers.Settings;
-
+using Audectra.Extensions.Sdk.V1;
 
 namespace Audectra.Extensions.Effects
 {
-    class Stroboscope : EffectBase, IExtension
+    [EffectExtension("Stroboscope", "Audectra", "1.3.0")]
+    class Stroboscope : EffectExtensionBase
     {
         private IEffectHelper _helper;
         private RgbColor _color;
@@ -27,8 +28,6 @@ namespace Audectra.Extensions.Effects
         {
             Flash,
         }
-
-        public Stroboscope() { }
 
         public Stroboscope(IEffectHelper effectHelper, int width, int height) : base(width, height)
         {
@@ -64,11 +63,6 @@ namespace Audectra.Extensions.Effects
             settingsBuilder.PageEnd();
         }
 
-        public override void OnSettingChanged(uint settingId, SettingValue value)
-        {
-            
-        }
-
         public override void OnTrigger(uint triggerId, bool risingEdge)
         {
             switch ((TriggerId) triggerId)
@@ -81,21 +75,6 @@ namespace Audectra.Extensions.Effects
                     }
                     break;
             }
-        }
-
-        public string GetName()
-        {
-            return "Stroboscope";
-        }
-
-        public string GetVersion()
-        {
-            return "v1.3.0";
-        }
-
-        public string GetAuthor()
-        {
-            return "Audectra";
         }
     }
 }

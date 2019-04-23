@@ -11,12 +11,15 @@ using Audectra.Layers.Effects;
 using Audectra.Layers.Settings;
 using Audectra.Layers.Requirements;
 using Audectra.Mathematics;
+using Audectra.Extensions.Sdk.V1;
 
 /* Your effects need to be in this namesapce. */
 namespace Audectra.Extensions.Effects
 {
-	/*	Implement the EffectBase base class and the IExtension interface. */
-    class BeatWave1D : EffectBase, IExtension
+	[MinWidthRequirement(4)]
+    [LandscapeAspectRatioRequirement()]
+	[EffectExtension("1D Beat Wave", "Audectra", "1.3.0")]
+    class BeatWave1D : EffectExtensionBase
     {
         private IEffectHelper _helper;
         private IRgbRender _render;
@@ -28,9 +31,6 @@ namespace Audectra.Extensions.Effects
 			/*	ValueId for configurable wave speed */
 			WaveSpeed = 0,
 		}
-		
-		/* 	This empty constructor is neccessary for Audectras extension loader engine. */
-        public BeatWave1D() { }
 
 		/*	This constructor will be called when a layer of your effect is being created. */
         public BeatWave1D(IEffectHelper effectHelper, int width, int height) : base(width, height)
@@ -70,12 +70,6 @@ namespace Audectra.Extensions.Effects
 			
             return _render;
         }
-
-		public override void GenerateRequirements(ILayerRequirementsBuilder reqBuilder)
-        {
-            reqBuilder.AddMinimumWidth(8);
-            reqBuilder.AddLandscapeAspectRatio();
-        }
 		
 		/*	To allow the user to configure your effect to their likings, you will need 
 			to specify what exactly is configureable. In this method you will specify
@@ -106,24 +100,6 @@ namespace Audectra.Extensions.Effects
 					_waveSimulation.Speed = value;
 					break;
 			}
-        }
-		
-		/*	Return the name of this effect. */
-        public string GetName()
-        {
-            return "1D Beat Wave";
-        }
-
-		/*	Return the version of this effect. */
-        public string GetVersion()
-        {
-            return "v1.3.0";
-        }
-
-		/*	Return the author of this effect. */
-        public string GetAuthor()
-        {
-            return "Audectra";
         }
     }
 }

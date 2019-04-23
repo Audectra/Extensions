@@ -13,10 +13,13 @@ using Audectra.Layers;
 using Audectra.Layers.Effects;
 using Audectra.Layers.Settings;
 using Audectra.Layers.Requirements;
+using Audectra.Extensions.Sdk.V1;
 
 namespace Audectra.Extensions.Effects
 {
-    class Sparkles : EffectBase, IExtension
+    [MinNumberOfPixelsRequirement(8)]
+    [EffectExtension("Sparkles", "Audectra", "1.3.0")]
+    class Sparkles : EffectExtensionBase
     {
         private readonly IEffectHelper _helper;
         private readonly IRgbRender _render;
@@ -41,8 +44,6 @@ namespace Audectra.Extensions.Effects
             Sparkle = 0,
         }
 
-        public Sparkles() { }
-
         public Sparkles(IEffectHelper effectHelper, int width, int height) : base(width, height)
         {
             _helper = effectHelper;
@@ -65,11 +66,6 @@ namespace Audectra.Extensions.Effects
             _particleSystem.Render(_render);
             
             return _render;
-        }
-
-        public override void GenerateRequirements(ILayerRequirementsBuilder reqBuilder)
-        {
-            reqBuilder.AddMinimumNumberOfPixels(8);
         }
 
         public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
@@ -142,21 +138,6 @@ namespace Audectra.Extensions.Effects
                     }
                     break;
             }
-        }
-
-        public string GetName()
-        {
-            return "Sparkles";
-        }
-
-        public string GetVersion()
-        {
-            return "v1.3.0";
-        }
-
-        public string GetAuthor()
-        {
-            return "Audectra";
         }
     }
 }

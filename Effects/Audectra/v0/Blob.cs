@@ -10,10 +10,13 @@ using Audectra.Layers;
 using Audectra.Layers.Effects;
 using Audectra.Layers.Settings;
 using Audectra.Layers.Requirements;
+using Audectra.Extensions.Sdk.V1;
 
 namespace Audectra.Extensions.Effects
 {
-    class Blob : EffectBase, IExtension
+    [MinNumberOfPixelsRequirement(8)]
+    [EffectExtension("Blob", "Audectra", "1.3.0")]
+    class Blob : EffectExtensionBase
     {
         private IEffectHelper _helper;
         private RgbColor _color;
@@ -32,8 +35,6 @@ namespace Audectra.Extensions.Effects
             XSizeValue,
             YSizeValue
         }
-
-        public Blob() { }
 
         public Blob(IEffectHelper effectHelper, int width, int height) : base(width, height)
         {
@@ -62,11 +63,6 @@ namespace Audectra.Extensions.Effects
             _helper.AddBlob(_render, _x0Pos, _y0Pos, _xSize, _ySize, _color);
 
             return _render;
-        }
-
-        public override void GenerateRequirements(ILayerRequirementsBuilder reqBuilder)
-        {
-            reqBuilder.AddMinimumNumberOfPixels(8);
         }
 
         public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
@@ -116,21 +112,6 @@ namespace Audectra.Extensions.Effects
                     _ySize = value;
                     break;
             }
-        }
-
-        public string GetName()
-        {
-            return "Blob";
-        }
-
-        public string GetVersion()
-        {
-            return "v1.3.0";
-        }
-
-        public string GetAuthor()
-        {
-            return "Audectra";
         }
     }
 }

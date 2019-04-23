@@ -10,10 +10,14 @@ using Audectra.Layers;
 using Audectra.Layers.Effects;
 using Audectra.Layers.Settings;
 using Audectra.Layers.Requirements;
+using Audectra.Extensions.Sdk.V1;
 
 namespace Audectra.Extensions.Effects
 {
-    class ColorWheel : EffectBase, IExtension
+    [MinWidthRequirement(4)]
+    [LandscapeAspectRatioRequirement()]
+    [EffectExtension("Color Wheel", "Audectra", "1.3.0")]
+    class ColorWheel : EffectExtensionBase
     {
         private IEffectHelper _helper;
         private RgbColor _color;
@@ -33,8 +37,6 @@ namespace Audectra.Extensions.Effects
             Speed,
             Scale,
         }
-
-        public ColorWheel() { }
 
         public ColorWheel(IEffectHelper effectHelper, int width, int height) : base(width, height)
         {
@@ -57,12 +59,6 @@ namespace Audectra.Extensions.Effects
             });
 
             return _render;
-        }
-
-        public override void GenerateRequirements(ILayerRequirementsBuilder reqBuilder)
-        {
-            reqBuilder.AddMinimumWidth(4);
-            reqBuilder.AddLandscapeAspectRatio();
         }
 
         public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
@@ -92,21 +88,6 @@ namespace Audectra.Extensions.Effects
                     _scale = value;
                     break;
             }
-        }
-
-        public string GetName()
-        {
-            return "Color Wheel";
-        }
-
-        public string GetVersion()
-        {
-            return "v1.3.0";
-        }
-
-        public string GetAuthor()
-        {
-            return "Audectra";
         }
     }
 }

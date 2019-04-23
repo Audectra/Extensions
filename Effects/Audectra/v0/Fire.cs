@@ -13,10 +13,13 @@ using Audectra.Layers;
 using Audectra.Layers.Effects;
 using Audectra.Layers.Settings;
 using Audectra.Layers.Requirements;
+using Audectra.Extensions.Sdk.V1;
 
 namespace Audectra.Extensions.Effects
 {
-    class Fire : EffectBase, IExtension
+    [MinDimensionsRequirement(8, 8)]
+    [EffectExtension("Fire", "Audectra", "1.3.0")]
+    class Fire : EffectExtensionBase
     {
         private readonly IEffectHelper _helper;
         private readonly IRgbRender _render;
@@ -40,8 +43,6 @@ namespace Audectra.Extensions.Effects
             ParticleBeginSizeValue,
             ParticleEndSizeValue
         }
-
-        public Fire() { }
 
         public Fire(IEffectHelper effectHelper, int width, int height) : base(width, height)
         {
@@ -91,11 +92,6 @@ namespace Audectra.Extensions.Effects
             _particleSystem.Render(_render);
             
             return _render;
-        }
-
-        public override void GenerateRequirements(ILayerRequirementsBuilder reqBuilder)
-        {
-            reqBuilder.AddMinimumDimensions(8, 8);
         }
 
         public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
@@ -161,21 +157,6 @@ namespace Audectra.Extensions.Effects
                         emitter.EndConfig.SetSize(value));
                     break;
             }
-        }
-
-        public string GetName()
-        {
-            return "Fire";
-        }
-
-        public string GetVersion()
-        {
-            return "v1.3.0";
-        }
-
-        public string GetAuthor()
-        {
-            return "Audectra";
         }
     }
 }

@@ -10,10 +10,14 @@ using Audectra.Layers;
 using Audectra.Layers.Effects;
 using Audectra.Layers.Settings;
 using Audectra.Layers.Requirements;
+using Audectra.Extensions.Sdk.V1;
 
 namespace Audectra.Extensions.Effects
 {
-    class ChromaBars : EffectBase, IExtension
+    [MinWidthRequirement(12)]
+    [LandscapeAspectRatioRequirement()]
+    [EffectExtension("Chroma Bars", "Audectra", "1.3.0")]
+    class ChromaBars : EffectExtensionBase
     {
         private IEffectHelper _helper;
         private RgbColor _color;
@@ -28,8 +32,6 @@ namespace Audectra.Extensions.Effects
             Color = 0,
             ThresholdValue
         }
-
-        public ChromaBars() { }
 
         public ChromaBars(IEffectHelper effectHelper, int width, int height) : base(width, height)
         {
@@ -62,12 +64,6 @@ namespace Audectra.Extensions.Effects
                 _render[x, 0] = color * intensity;
         }
 
-        public override void GenerateRequirements(ILayerRequirementsBuilder reqBuilder)
-        {
-            reqBuilder.AddMinimumWidth(12);
-            reqBuilder.AddLandscapeAspectRatio();
-        }
-
         public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
         {
             settingsBuilder.PageBegin();
@@ -92,21 +88,6 @@ namespace Audectra.Extensions.Effects
                     _threshold = value;
                     break;
             }
-        }
-
-        public string GetName()
-        {
-            return "Chroma Bars";
-        }
-
-        public string GetVersion()
-        {
-            return "v1.3.0";
-        }
-
-        public string GetAuthor()
-        {
-            return "Audectra";
         }
     }
 }
