@@ -5,27 +5,23 @@
 
 using System;
 using System.Linq;
+using System.Numerics;
 using System.Collections.Generic;
 
-using Audectra.Graphics;
-using Audectra.Graphics.Particles;
-using Audectra.Layers;
-using Audectra.Layers.Effects;
-using Audectra.Layers.Settings;
-using Audectra.Layers.Requirements;
+using SkiaSharp;
 using Audectra.Extensions.Sdk.V1;
 
 namespace Audectra.Extensions.Effects
 {
-    [MinWidthRequirement(8)]
-    [LandscapeAspectRatioRequirement()]
+    [MinWidth(8)]
+    [LandscapeAspectRatio()]
     [EffectExtension("Beams", "Audectra", "1.3.0")]
     class Beams : EffectExtensionBase
     {
-        private readonly IEffectHelper _helper;
-        private readonly IRgbRender _render;
+        private readonly IEffectApi _api;
+        private readonly IRender _render;
 
-        private RgbColor _color;
+        private SKColor _color;
         private float _particleSpeed;
         private float _particleSize;
         private readonly IParticleSystem _particleSystem;
@@ -45,18 +41,18 @@ namespace Audectra.Extensions.Effects
             BeamMeUp = 0,
         }
 
-        public Beams(IEffectHelper effectHelper, int width, int height) : base(width, height)
+        public Beams(IEffectApi effectApi, int width, int height) : base(width, height)
         {
-            _helper = effectHelper;
-            _render = _helper.CreateRender();
-            _particleSystem = _helper.CreateParticleSystem();
+            _api = effectApi;
+            _render = _api.CreateRender();
+            _particleSystem = _api.CreateParticleSystem();
 
-            _color = new RgbColor(0.0f, 0.5f, 0.5f);
+            _color = new SKColor(0, 128, 128);
             _particleSpeed = 5;
             _particleSize = 4;
         }
 
-        public override IRgbRender Render(float dt)
+        public override IRender Render(float dt)
         {
             _render.Clear();
             _particleSystem.Update(dt);
@@ -65,7 +61,7 @@ namespace Audectra.Extensions.Effects
             return _render;
         }
 
-        public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
+        public override void GenerateSettings(ISettingsBuilder settingsBuilder)
         {
             settingsBuilder.PageBegin();
             settingsBuilder.AddColorGroup(_color, (uint)SettingId.ColorValue);
@@ -116,13 +112,13 @@ namespace Audectra.Extensions.Effects
                         Angle = 0,
                         Life = float.MaxValue,
                         Speed = _particleSpeed,
+                        Position = new Vector2(0, 0),
+                        AxisPosition = new Vector2(0 ,0),
+                        BeginSize = _particleSize,
+                        EndSize = _particleSize,
+                        BeginColor = _color,
+                        EndColor = _color
                     };
-
-                    particleConfig.SetPosition(0, 0);
-                    particleConfig.SetAxisPosition(0, 0);
-
-                    particleConfig.BeginConfig = new ParticleEndpoint(_particleSize, _color);
-                    particleConfig.EndConfig = new ParticleEndpoint(_particleSize, _color);
 
                     _particleSystem.AddParticle(particleConfig);
                     break;

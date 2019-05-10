@@ -5,23 +5,20 @@
 
 using System;
 
-using Audectra.Graphics;
-using Audectra.Layers;
-using Audectra.Layers.Effects;
-using Audectra.Layers.Settings;
-using Audectra.Layers.Requirements;
+using SkiaSharp;
 using Audectra.Extensions.Sdk.V1;
 
 namespace Audectra.Extensions.Effects
 {
-    [MinWidthRequirement(4)]
-    [LandscapeAspectRatioRequirement()]
+    [MinWidth(4)]
+    [LandscapeAspectRatio()]
     [EffectExtension("Symmetric Beat Bars", "Audectra", "1.3.0")]
     class SymmetricBeatBars : EffectExtensionBase
     {
-        private IEffectHelper _helper;
-        private RgbColor _color;
-        private IRgbRender _render;
+        private IEffectApi _api;
+        private SKColor _color;
+        private IRender _render;
+        private IAudioFeatureCache _featureCache;
 
         private float _remainingBeatTime;
         private float _beatPeriod;
@@ -31,22 +28,23 @@ namespace Audectra.Extensions.Effects
             Color,
         }
 
-        public SymmetricBeatBars(IEffectHelper effectHelper, int width, int height) : base(width, height)
+        public SymmetricBeatBars(IEffectApi effectApi, int width, int height) : base(width, height)
         {
-            _helper = effectHelper;
-            _color = new RgbColor(0, 0.5f, 0.5f);
-            _render = _helper.CreateRender();
+            _api = effectApi;
+            _color = new SKColor(0, 128, 128);
+            _render = _api.CreateRender();
+            _featureCache = _api.CreateAudioFeatureCache();
 
             _remainingBeatTime = 0;
         }
 
-        public override IRgbRender Render(float dt)
+        public override IRender Render(float dt)
         {
             float barValue = 0;
 
-            if (_helper.IsBeat())
+            if (_featureCache.IsBeat())
             {
-                _beatPeriod = _helper.GetBeatPeriod();
+                _beatPeriod = _featureCache.GetBeatPeriod();
                 _remainingBeatTime = _beatPeriod;
             }
             else if (_remainingBeatTime > 0)
@@ -57,14 +55,26 @@ namespace Audectra.Extensions.Effects
 
             int barSize = (int) (Width / 2 * barValue);
 
-            _render.Clear();
-            _helper.FillBar(_render, Width / 2, barSize, _color);
-            _helper.FillBar(_render, Width / 2 - barSize, barSize, _color);
+            using (var canvas = _api.CreateCanvas(_render))
+            {
+                canvas.Clear();
+
+                var paint = new SKPaint
+                {
+                    IsAntialias = true,
+                    Color = _color,
+                    Style = SKPaintStyle.Fill
+                };
+
+                canvas.DrawRect(Width / 2, 0, barSize, Height, paint);
+                canvas.DrawRect(Width / 2 - barSize, 0, barSize, Height, paint);
+                paint.Dispose();
+            }
 
             return _render;
         }
 
-        public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
+        public override void GenerateSettings(ISettingsBuilder settingsBuilder)
         {
             settingsBuilder.PageBegin();
             settingsBuilder.AddColorGroup(_color, (uint)SettingId.Color);

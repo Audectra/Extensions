@@ -5,22 +5,18 @@
 
 using System;
 
-using Audectra.Graphics;
-using Audectra.Layers;
-using Audectra.Layers.Effects;
-using Audectra.Layers.Settings;
-using Audectra.Layers.Requirements;
+using SkiaSharp;
 using Audectra.Extensions.Sdk.V1;
 
 namespace Audectra.Extensions.Effects
 {
-    [MinNumberOfPixelsRequirement(8)]
+    [MinNumberOfPixels(8)]
     [EffectExtension("Blob", "Audectra", "1.3.0")]
     class Blob : EffectExtensionBase
     {
-        private IEffectHelper _helper;
-        private RgbColor _color;
-        private IRgbRender _render;
+        private IEffectApi _api;
+        private SKColor _color;
+        private IRender _render;
 
         private float _x0Pos;
         private float _y0Pos;
@@ -36,11 +32,11 @@ namespace Audectra.Extensions.Effects
             YSizeValue
         }
 
-        public Blob(IEffectHelper effectHelper, int width, int height) : base(width, height)
+        public Blob(IEffectApi effectApi, int width, int height) : base(width, height)
         {
-            _helper = effectHelper;
-            _color = new RgbColor(0, 0.5f, 0.5f);
-            _render = _helper.CreateRender();
+            _api = effectApi;
+            _color = new SKColor(0, 128, 128);
+            _render = _api.CreateRender();
 
             _x0Pos = Width / 2;
             _y0Pos = Height / 2;
@@ -57,15 +53,30 @@ namespace Audectra.Extensions.Effects
             }
         }
 
-        public override IRgbRender Render(float dt)
+        public override IRender Render(float dt)
         {
-            _render.Clear();
-            _helper.AddBlob(_render, _x0Pos, _y0Pos, _xSize, _ySize, _color);
+            float blobSize = (Height > 1) ? 0.5f * (_xSize + _ySize) : _xSize;
+
+            using (var canvas = _api.CreateCanvas(_render))
+            using (SKPaint paint = new SKPaint())
+            {
+                canvas.Clear();
+
+                paint.IsAntialias = true;
+                paint.Shader = SKShader.CreateRadialGradient(
+                    new SKPoint(_x0Pos, _y0Pos),
+                    blobSize,
+                    new[] {_color, SKColors.Black},
+                    null,
+                    SKShaderTileMode.Clamp);
+
+                canvas.DrawOval(_x0Pos, _y0Pos, _xSize, _ySize, paint);
+            }
 
             return _render;
         }
 
-        public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
+        public override void GenerateSettings(ISettingsBuilder settingsBuilder)
         {
             settingsBuilder.PageBegin();
             settingsBuilder.AddColorGroup(_color, (uint)SettingId.ColorValue);

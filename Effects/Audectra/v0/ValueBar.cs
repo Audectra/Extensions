@@ -5,23 +5,19 @@
 
 using System;
 
-using Audectra.Graphics;
-using Audectra.Layers;
-using Audectra.Layers.Effects;
-using Audectra.Layers.Settings;
-using Audectra.Layers.Requirements;
+using SkiaSharp;
 using Audectra.Extensions.Sdk.V1;
 
 namespace Audectra.Extensions.Effects
 {
-    [MinWidthRequirement(4)]
-    [LandscapeAspectRatioRequirement()]
+    [MinWidth(4)]
+    [LandscapeAspectRatio()]
     [EffectExtension("Value Bar", "Audectra", "1.3.0")]
     class ValueBar : EffectExtensionBase
     {
-        private IEffectHelper _helper;
-        private RgbColor _color;
-        private IRgbRender _render;
+        private IEffectApi _api;
+        private SKColor _color;
+        private IRender _render;
 
         private float _barValue;
 
@@ -31,24 +27,36 @@ namespace Audectra.Extensions.Effects
             BarValue,
         }
 
-        public ValueBar(IEffectHelper effectHelper, int width, int height) : base(width, height)
+        public ValueBar(IEffectApi effectApi, int width, int height) : base(width, height)
         {
-            _helper = effectHelper;
-            _color = new RgbColor(0, 0.5f, 0.5f);
-            _render = _helper.CreateRender();
+            _api = effectApi;
+            _color = new SKColor(0, 128, 128);
+            _render = _api.CreateRender();
 
             _barValue = 0;
         }
 
-        public override IRgbRender Render(float dt)
+        public override IRender Render(float dt)
         {
-            _render.Clear();
-            _helper.FillBar(_render, 0, (int)(Width * _barValue), _color);
+            using (var canvas = _api.CreateCanvas(_render))
+            {
+                canvas.Clear();
+
+                var paint = new SKPaint
+                {
+                    IsAntialias = true,
+                    Color = _color,
+                    Style = SKPaintStyle.Fill
+                };
+
+                canvas.DrawRect(0, 0, Width * _barValue, Height, paint);
+                paint.Dispose();
+            }
 
             return _render;
         }
 
-        public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
+        public override void GenerateSettings(ISettingsBuilder settingsBuilder)
         {
             settingsBuilder.PageBegin();
             settingsBuilder.AddColorGroup(_color, (uint)SettingId.Color);

@@ -4,30 +4,26 @@
  */
 
 using System;
-using System.Runtime.InteropServices;
 
-using Audectra.Graphics;
-using Audectra.Layers;
-using Audectra.Layers.Effects;
-using Audectra.Layers.Settings;
+using SkiaSharp;
 using Audectra.Extensions.Sdk.V1;
 
 namespace Audectra.Extensions.Effects
 {
-    [MinWidthRequirement(4)]
-    [LandscapeAspectRatioRequirement()]
+    [MinWidth(4)]
+    [LandscapeAspectRatio()]
     [EffectExtension("Bars", "Audectra", "1.3.0")]
     class Bars : EffectExtensionBase
     {
-        private IEffectHelper _helper;
-        private RgbColor _color;
-        private IRgbRender _render;
+        private IEffectApi _api;
+        private SKColor _color;
+        private IRender _render;
 
         private struct BarItem
         {
             public float Value;
             public float MaxLife;
-            public RgbColor Color;
+            public SKColor Color;
         }
 
         private int _maxNumBars;
@@ -52,11 +48,11 @@ namespace Audectra.Extensions.Effects
             BarBoom = 0,
         }
 
-        public Bars(IEffectHelper effectHelper, int width, int height) : base(width, height)
+        public Bars(IEffectApi effectApi, int width, int height) : base(width, height)
         {
-            _helper = effectHelper;
-            _color = new RgbColor(0, 0.5f, 0.5f);
-            _render = _helper.CreateRender();
+            _api = effectApi;
+            _color = new SKColor(0, 128, 128);
+            _render = _api.CreateRender();
 
             _maxNumBars = Math.Min((int)(width / 2), 12);
             _numBars = 4;
@@ -73,24 +69,37 @@ namespace Audectra.Extensions.Effects
             _bars = new BarItem[_numBars];
 
             for (int i = 0; i < _numBars; i++)
-                _bars[i].Color = new RgbColor(0, 0, 0);
+                _bars[i].Color = new SKColor(0, 0, 0);
         }
 
-        public override IRgbRender Render(float dt)
+        public override IRender Render(float dt)
         {
             lock (_barsLock)
             {
                 UpdateBars(dt);
 
-                for (int i = 0; i < _numBars; i++)
+                using (var canvas = _api.CreateCanvas(_render))
                 {
-                    int x0 = i * _barSize;
-                    float intensity = 0;
-                    
-                    if (_bars[i].MaxLife > 0)
-                        intensity = _bars[i].Value / _bars[i].MaxLife;
+                    canvas.Clear();
 
-                    _helper.FillBar(_render, x0, _barSize, _bars[i].Color * intensity);
+                    for (int i = 0; i < _numBars; i++)
+                    {
+                        int x0 = i * _barSize;
+                        float intensity = 0;
+                        
+                        if (_bars[i].MaxLife > 0)
+                            intensity = _bars[i].Value / _bars[i].MaxLife;
+
+                        var paint = new SKPaint
+                        {
+                            IsAntialias = true,
+                            Color = _bars[i].Color.WithScale(intensity),
+                            Style = SKPaintStyle.Fill
+                        };
+
+                        canvas.DrawRect(x0, 0, _barSize, Height, paint);
+                        paint.Dispose();
+                    }
                 }
             }
 
@@ -108,7 +117,7 @@ namespace Audectra.Extensions.Effects
             }
         }
 
-        public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
+        public override void GenerateSettings(ISettingsBuilder settingsBuilder)
         {
             settingsBuilder.PageBegin();
             settingsBuilder.AddColorGroup(_color, (uint)SettingId.Color);

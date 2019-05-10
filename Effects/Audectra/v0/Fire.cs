@@ -5,28 +5,24 @@
 
 using System;
 using System.Linq;
+using System.Numerics;
 using System.Collections.Generic;
 
-using Audectra.Graphics;
-using Audectra.Graphics.Particles;
-using Audectra.Layers;
-using Audectra.Layers.Effects;
-using Audectra.Layers.Settings;
-using Audectra.Layers.Requirements;
+using SkiaSharp;
 using Audectra.Extensions.Sdk.V1;
 
 namespace Audectra.Extensions.Effects
 {
-    [MinDimensionsRequirement(8, 8)]
+    [MinDimensions(8, 8)]
     [EffectExtension("Fire", "Audectra", "1.3.0")]
     class Fire : EffectExtensionBase
     {
-        private readonly IEffectHelper _helper;
-        private readonly IRgbRender _render;
+        private readonly IEffectApi _api;
+        private readonly IRender _render;
 
-        private RgbColor _beginColor;
+        private SKColor _beginColor;
         private readonly IParticleSystem _particleSystem;
-        private readonly List<ParticleEmitterConfig> _particleEmitters;
+        private readonly List<IParticleEmitter> _particleEmitters;
 
         private const float EmberDistance = 4;
         private const float MaxParticleSpeed = 20f;
@@ -44,15 +40,15 @@ namespace Audectra.Extensions.Effects
             ParticleEndSizeValue
         }
 
-        public Fire(IEffectHelper effectHelper, int width, int height) : base(width, height)
+        public Fire(IEffectApi effectApi, int width, int height) : base(width, height)
         {
-            _helper = effectHelper;
-            _render = _helper.CreateRender();
-            _particleSystem = _helper.CreateParticleSystem();
+            _api = effectApi;
+            _render = _api.CreateRender();
+            _particleSystem = _api.CreateParticleSystem();
 
-            _beginColor = new RgbColor(0.5f, 0.25f, 0.1f);
-            var endColor = new RgbColor(0.25f, 0.25f, 0.25f);
-            _particleEmitters = new List<ParticleEmitterConfig>();
+            _beginColor = new SKColor(128, 64, 16);
+            var endColor = new SKColor(64, 64, 64);
+            _particleEmitters = new List<IParticleEmitter>();
 
             int numEmbers = Math.Max((int) (Width / EmberDistance), 1);
 
@@ -61,31 +57,30 @@ namespace Audectra.Extensions.Effects
                 var xPos = Width / (numEmbers - 1f) * i;
                 var yPos = Height;
 
-                var emitConfig = new ParticleEmitterConfig(xPos, yPos, 8);
-                var beginConfig = new ParticleEmitterEndpoint();
-                var endConfig = new ParticleEmitterEndpoint();
+                var emitterConfig = new ParticleEmitterConfig
+                {
+                    Position = new Vector2(xPos, yPos),
+                    AxisPosition = new Vector2(xPos, yPos),
+                    EmissionRate = 8,
+                    Angle = new Range<float>(45, 135),
+                    Life = 4,
+                    Speed = 4,
+                    RadialAcceleration = 0,
+                    TangentialAcceleration = 0,
+                    BeginColor = _beginColor,
+                    EndColor = endColor,
+                    BeginSize = 4,
+                    EndSize = 4,
+                    EnableSizeTransition = true,
+                    EnableColorTransition = true,
+                };
 
-                beginConfig.SetColor(_beginColor);
-                beginConfig.SetSize(4);
-
-                endConfig.SetColor(endColor);
-                endConfig.SetSize(4);
-
-                emitConfig.SetAngle(45, 135);
-                emitConfig.SetLife(4);
-                emitConfig.SetSpeed(4);
-                emitConfig.SetRadialAccel(0f);
-                emitConfig.SetTangentAccel(0f);
-                emitConfig.EnableColorShift();
-                emitConfig.EnableSizeShift();
-                emitConfig.SetEndpoints(beginConfig, endConfig);
-
-                _particleSystem.AddEmitter(emitConfig);
-                _particleEmitters.Add(emitConfig);
+                var emitter = _particleSystem.AddEmitter(emitterConfig);
+                _particleEmitters.Add(emitter);
             }
         }
 
-        public override IRgbRender Render(float dt)
+        public override IRender Render(float dt)
         {
             _render.Clear();
             _particleSystem.Update(dt);
@@ -94,7 +89,7 @@ namespace Audectra.Extensions.Effects
             return _render;
         }
 
-        public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
+        public override void GenerateSettings(ISettingsBuilder settingsBuilder)
         {
             settingsBuilder.PageBegin();
 
@@ -103,21 +98,21 @@ namespace Audectra.Extensions.Effects
             settingsBuilder.GroupEnd();
 
             settingsBuilder.GroupBegin("Velocity");
-            settingsBuilder.AddSlider(_particleEmitters[0].MinSpeed, 0, MaxParticleSpeed, (uint)SettingId.ParticleSpeedValue);
+            settingsBuilder.AddSlider(_particleEmitters[0].Speed.Minimum, 0, MaxParticleSpeed, (uint)SettingId.ParticleSpeedValue);
             settingsBuilder.GroupEnd();
 
             settingsBuilder.GroupBegin("Life");
-            settingsBuilder.AddSlider(_particleEmitters[0].MinLife, 0, MaxParticleLife, (uint)SettingId.ParticleLifeValue);
+            settingsBuilder.AddSlider(_particleEmitters[0].Life.Minimum, 0, MaxParticleLife, (uint)SettingId.ParticleLifeValue);
             settingsBuilder.GroupEnd();
             
             settingsBuilder.AddColorGroup(_beginColor, (uint)SettingId.BeginColorValue);
 
             settingsBuilder.GroupBegin("Begin Size");
-            settingsBuilder.AddSlider(_particleEmitters[0].BeginConfig.MinSize, 1, MaxParticleSize, (uint)SettingId.ParticleBeginSizeValue);
+            settingsBuilder.AddSlider(_particleEmitters[0].BeginSize.Minimum, 1, MaxParticleSize, (uint)SettingId.ParticleBeginSizeValue);
             settingsBuilder.GroupEnd();
 
             settingsBuilder.GroupBegin("End Size");
-            settingsBuilder.AddSlider(_particleEmitters[0].EndConfig.MinSize, 0, MaxParticleSize, (uint)SettingId.ParticleEndSizeValue);
+            settingsBuilder.AddSlider(_particleEmitters[0].EndSize.Minimum, 0, MaxParticleSize, (uint)SettingId.ParticleEndSizeValue);
             settingsBuilder.GroupEnd();
 
             settingsBuilder.PageEnd();
@@ -129,32 +124,32 @@ namespace Audectra.Extensions.Effects
             {
                 case SettingId.BeginColorValue:
                     _particleEmitters.ForEach(emitter => 
-                        emitter.BeginConfig.SetColor(value));
+                        emitter.BeginColor = value);
                     break;
 
                 case SettingId.EmissionRateValue:
                     _particleEmitters.ForEach(emitter => 
-                        emitter.SetEmissionRate(value));
+                        emitter.EmissionRate = value);
                     break;
 
                 case SettingId.ParticleSpeedValue:
                     _particleEmitters.ForEach(emitter => 
-                        emitter.SetSpeed(value));
+                        emitter.Speed = value.ToSingle());
                     break;
 
                 case SettingId.ParticleLifeValue:
                     _particleEmitters.ForEach(emitter => 
-                        emitter.SetLife(value));
+                        emitter.Life = value.ToSingle());
                     break;
 
                 case SettingId.ParticleBeginSizeValue:
                     _particleEmitters.ForEach(emitter => 
-                        emitter.BeginConfig.SetSize(value));
+                        emitter.BeginSize = value.ToSingle());
                     break;
 
                 case SettingId.ParticleEndSizeValue:
                     _particleEmitters.ForEach(emitter => 
-                        emitter.EndConfig.SetSize(value));
+                        emitter.EndSize = value.ToSingle());
                     break;
             }
         }

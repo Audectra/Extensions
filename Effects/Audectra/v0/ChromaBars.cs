@@ -5,23 +5,20 @@
 
 using System;
 
-using Audectra.Graphics;
-using Audectra.Layers;
-using Audectra.Layers.Effects;
-using Audectra.Layers.Settings;
-using Audectra.Layers.Requirements;
+using SkiaSharp;
 using Audectra.Extensions.Sdk.V1;
 
 namespace Audectra.Extensions.Effects
 {
-    [MinWidthRequirement(12)]
-    [LandscapeAspectRatioRequirement()]
+    [MinWidth(12)]
+    [LandscapeAspectRatio()]
     [EffectExtension("Chroma Bars", "Audectra", "1.3.0")]
     class ChromaBars : EffectExtensionBase
     {
-        private IEffectHelper _helper;
-        private RgbColor _color;
-        private IRgbRender _render;
+        private IEffectApi _api;
+        private SKColor _color;
+        private IRender _render;
+        private IAudioFeatureCache _featureCache;
 
         private const int NumBars = 12;
         private int _barSize;
@@ -33,38 +30,47 @@ namespace Audectra.Extensions.Effects
             ThresholdValue
         }
 
-        public ChromaBars(IEffectHelper effectHelper, int width, int height) : base(width, height)
+        public ChromaBars(IEffectApi effectApi, int width, int height) : base(width, height)
         {
-            _helper = effectHelper;
-            _color = new RgbColor(0, 0.5f, 0.5f);
-            _render = _helper.CreateRender();
+            _api = effectApi;
+            _color = new SKColor(0, 128, 128);
+            _render = _api.CreateRender();
+            _featureCache = _api.CreateAudioFeatureCache();
 
             _threshold = 0.0f;
             _barSize = (int)(width / NumBars);
         }
 
-        public override IRgbRender Render(float dt)
+        public override IRender Render(float dt)
         {
-            _render.Clear();
-            var chromas = _helper.GetChromas();
+            var chromas = _featureCache.GetChromas();
 
-            for (int i = 0; i < NumBars; i++)
-                if (chromas[i] >= _threshold)
+            using (var canvas = _api.CreateCanvas(_render))
+            {
+                canvas.Clear();
+
+                for (int i = 0; i < NumBars; i++)
                 {
-                    int x0 = i * _barSize;
-                    FillBar(x0, _color, (float) chromas[i]);
+                    if (chromas[i] >= _threshold)
+                    {
+                        var paint = new SKPaint
+                        {
+                            IsAntialias = true,
+                            Color = _color.WithScale(chromas[i]),
+                            Style = SKPaintStyle.Fill
+                        };
+
+                        int x0 = i * _barSize;
+                        canvas.DrawRect(x0, 0, _barSize, Height, paint);
+                        paint.Dispose();
+                    }
                 }
+            }
 
             return _render;
         }
 
-        private void FillBar(int x0, RgbColor color, float intensity)
-        {
-            for (int x = x0; x < x0 + _barSize; x++)
-                _render[x, 0] = color * intensity;
-        }
-
-        public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
+        public override void GenerateSettings(ISettingsBuilder settingsBuilder)
         {
             settingsBuilder.PageBegin();
             settingsBuilder.AddColorGroup(_color, (uint)SettingId.Color);

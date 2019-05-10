@@ -5,25 +5,21 @@
 
 using System;
 
-using Audectra.Graphics;
-using Audectra.Layers;
-using Audectra.Layers.Effects;
-using Audectra.Layers.Settings;
-using Audectra.Layers.Requirements;
-using Audectra.Mathematics;
+using SkiaSharp;
 using Audectra.Extensions.Sdk.V1;
 
 /* Your effects need to be in this namesapce. */
 namespace Audectra.Extensions.Effects
 {
-	[MinWidthRequirement(4)]
-    [LandscapeAspectRatioRequirement()]
+	[MinWidth(4)]
+    [LandscapeAspectRatio()]
 	[EffectExtension("1D Beat Wave", "Audectra", "1.3.0")]
     class BeatWave1D : EffectExtensionBase
     {
-        private IEffectHelper _helper;
-        private IRgbRender _render;
+        private IEffectApi _api;
+        private IRender _render;
 		private IWaveSimulation1D _waveSimulation;
+		private IAudioFeatureCache _featureCache;
 		
 		/*	Enumeration for each value you want to be configurable in the layer settings. */
 		private enum SettingId
@@ -33,16 +29,17 @@ namespace Audectra.Extensions.Effects
 		}
 
 		/*	This constructor will be called when a layer of your effect is being created. */
-        public BeatWave1D(IEffectHelper effectHelper, int width, int height) : base(width, height)
+        public BeatWave1D(IEffectApi effectApi, int width, int height) : base(width, height)
         {
-			/*	Save the effect helper in your class, you will need it. */
-            _helper = effectHelper;
+			/*	Save the effect api in your class, you will need it. */
+            _api = effectApi;
+			_featureCache = _api.CreateAudioFeatureCache();
 			
-			/*	Create a render for your effect using the effect helper. */
-            _render = _helper.CreateRender();
+			/*	Create a render for your effect using the effect api. */
+            _render = _api.CreateRender();
 			
-			/*	Create a wave simulation using the effect helper. */
-			_waveSimulation = _helper.CreateWaveSimulation1D();
+			/*	Create a wave simulation using the effect api. */
+			_waveSimulation = _api.CreateWaveSimulation1D();
 			
 			/*	Lets double the wave speeds */
 			_waveSimulation.Speed = 2.0;
@@ -50,12 +47,12 @@ namespace Audectra.Extensions.Effects
 
 		/*	In this method you will be able to render your effect. It will be called for 
 			each frame of your project, assuming this layer is enabled. */
-        public override IRgbRender Render(float dt)
+        public override IRender Render(float dt)
         {
 			/*	Add a new droplet with random color on each beat. */
-			if (_helper.IsBeat())
+			if (_featureCache.IsBeat())
 			{
-				var color = _helper.CreateRandomColor();
+				var color = _api.CreateRandomColor();
 				_waveSimulation.AddDrop(Width / 2, color);
 			}
 			
@@ -75,7 +72,7 @@ namespace Audectra.Extensions.Effects
 			to specify what exactly is configureable. In this method you will specify
 			what controls you request from Audectra for the layer settings side panel
 			of your effect. This method generally only gets called once per layer. */
-        public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
+        public override void GenerateSettings(ISettingsBuilder settingsBuilder)
         {
 			settingsBuilder.PageBegin();
 
@@ -95,7 +92,7 @@ namespace Audectra.Extensions.Effects
 			switch ((SettingId)settingId)
 			{
 				/*	The wave speed has been changed either by the user or a binding. Use the
-					effect helper to convert the value to a single. */
+					effect api to convert the value to a single. */
 				case SettingId.WaveSpeed:
 					_waveSimulation.Speed = value;
 					break;

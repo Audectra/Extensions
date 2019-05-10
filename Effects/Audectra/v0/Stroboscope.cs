@@ -5,10 +5,7 @@
 
 using System;
 
-using Audectra.Graphics;
-using Audectra.Layers;
-using Audectra.Layers.Effects;
-using Audectra.Layers.Settings;
+using SkiaSharp;
 using Audectra.Extensions.Sdk.V1;
 
 namespace Audectra.Extensions.Effects
@@ -16,9 +13,9 @@ namespace Audectra.Extensions.Effects
     [EffectExtension("Stroboscope", "Audectra", "1.3.0")]
     class Stroboscope : EffectExtensionBase
     {
-        private IEffectHelper _helper;
-        private RgbColor _color;
-        private IRgbRender _render;
+        private IEffectApi _api;
+        private SKColor _color;
+        private IRender _render;
 
         private float _flashDuration;
 
@@ -29,30 +26,32 @@ namespace Audectra.Extensions.Effects
             Flash,
         }
 
-        public Stroboscope(IEffectHelper effectHelper, int width, int height) : base(width, height)
+        public Stroboscope(IEffectApi effectApi, int width, int height) : base(width, height)
         {
-            _helper = effectHelper;
-            _color = new RgbColor(0, 0, 0);
-            _render = _helper.CreateRender();
+            _api = effectApi;
+            _color = new SKColor(0, 0, 0);
+            _render = _api.CreateRender();
 
             _flashDuration = MaxFlashDuration;
         }
 
-        public override IRgbRender Render(float dt)
+        public override IRender Render(float dt)
         {
             if (_flashDuration > MaxFlashDuration)
-                _color = new RgbColor(0, 0, 0);
+                _color = new SKColor(0, 0, 0);
             else
             {
                 _flashDuration += dt;
-                _color = _color * (1f - _flashDuration / MaxFlashDuration);
+                _color = _color.WithScale(1f - _flashDuration / MaxFlashDuration);
             }
 
-            _render.Map((x, y) => _color);
+            using (var canvas = _api.CreateCanvas(_render))
+                canvas.Clear(_color);
+                
             return _render;
         }
 
-        public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
+        public override void GenerateSettings(ISettingsBuilder settingsBuilder)
         {
             settingsBuilder.PageBegin();
 
@@ -70,7 +69,7 @@ namespace Audectra.Extensions.Effects
                 case TriggerId.Flash:
                     if (risingEdge)
                     {
-                        _color = new RgbColor(1, 1, 1);
+                        _color = new SKColor(255, 255, 255);
                         _flashDuration = 0;
                     }
                     break;

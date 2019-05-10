@@ -5,23 +5,19 @@
 
 using System;
 
-using Audectra.Graphics;
-using Audectra.Layers;
-using Audectra.Layers.Effects;
-using Audectra.Layers.Settings;
-using Audectra.Layers.Requirements;
+using SkiaSharp;
 using Audectra.Extensions.Sdk.V1;
 
 namespace Audectra.Extensions.Effects
 {
-    [MinWidthRequirement(4)]
-    [LandscapeAspectRatioRequirement()]
+    [MinWidth(4)]
+    [LandscapeAspectRatio()]
     [EffectExtension("Color Wheel", "Audectra", "1.3.0")]
     class ColorWheel : EffectExtensionBase
     {
-        private IEffectHelper _helper;
-        private RgbColor _color;
-        private IRgbRender _render;
+        private IEffectApi _api;
+        private SKColor _color;
+        private IRender _render;
 
         private float _offset;
 
@@ -38,30 +34,30 @@ namespace Audectra.Extensions.Effects
             Scale,
         }
 
-        public ColorWheel(IEffectHelper effectHelper, int width, int height) : base(width, height)
+        public ColorWheel(IEffectApi effectApi, int width, int height) : base(width, height)
         {
-            _helper = effectHelper;
-            _color = new RgbColor(0, 0.5f, 0.5f);
-            _render = _helper.CreateRender();
+            _api = effectApi;
+            _color = new SKColor(0, 128, 128);
+            _render = _api.CreateRender();
 
             _speed = 25;
             _offset = 0;
             _scale = 1;
         }
 
-        public override IRgbRender Render(float dt)
+        public override IRender Render(float dt)
         {
             _offset = (_offset + _speed * dt) % 360;
             _render.Map((x, y) =>
             {
                 float hue = ((float) x / Width * 360f * _scale + _offset) % 360;
-                return new HsvColor(hue, 1, 1);
+                return SKColor.FromHsv(hue, 100, 100);
             });
 
             return _render;
         }
 
-        public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
+        public override void GenerateSettings(ISettingsBuilder settingsBuilder)
         {
             settingsBuilder.PageBegin();
 

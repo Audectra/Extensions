@@ -5,25 +5,20 @@
 
 using System;
 
-using Audectra.Graphics;
-using Audectra.Layers;
-using Audectra.Layers.Effects;
-using Audectra.Layers.Settings;
-using Audectra.Layers.Requirements;
-using Audectra.Mathematics;
+using SkiaSharp;
 using Audectra.Extensions.Sdk.V1;
 
 /* Your effects need to be in this namesapce. */
 namespace Audectra.Extensions.Effects
 {
-	[MinWidthRequirement(8)]
-    [LandscapeAspectRatioRequirement()]
+	[MinWidth(8)]
+    [LandscapeAspectRatio()]
 	[EffectExtension("1D Wave", "Audectra", "1.3.0")]
     class Wave1D : EffectExtensionBase
     {
-        private IEffectHelper _helper;
-        private RgbColor _color;
-        private IRgbRender _render;
+        private IEffectApi _api;
+        private SKColor _color;
+        private IRender _render;
 		private IWaveSimulation1D _waveSimulation;
 		
 		/*	Enumeration for each value you want to be configurable in the layer settings. */
@@ -44,19 +39,19 @@ namespace Audectra.Extensions.Effects
 		}
 
 		/*	This constructor will be called when a layer of your effect is being created. */
-        public Wave1D(IEffectHelper effectHelper, int width, int height) : base(width, height)
+        public Wave1D(IEffectApi effectApi, int width, int height) : base(width, height)
         {
-			/*	Save the effect helper in your class, you will need it. */
-            _helper = effectHelper;
+			/*	Save the effect api in your class, you will need it. */
+            _api = effectApi;
 			
 			/*	Set the default color. */
-            _color = new RgbColor(0, 0.5f, 0.5f);
+            _color = new SKColor(0, 128, 128);
 			
-			/*	Create a render for your effect using the effect helper. */
-            _render = _helper.CreateRender();
+			/*	Create a render for your effect using the effect api. */
+            _render = _api.CreateRender();
 			
-			/*	Create a wave simulation using the effect helper. */
-			_waveSimulation = _helper.CreateWaveSimulation1D();
+			/*	Create a wave simulation using the effect api. */
+			_waveSimulation = _api.CreateWaveSimulation1D();
 			
 			/*	Lets double the wave speeds */
 			_waveSimulation.Speed = 2.0;
@@ -64,7 +59,7 @@ namespace Audectra.Extensions.Effects
 
 		/*	In this method you will be able to render your effect. It will be called for 
 			each frame of your project, assuming this layer is enabled. */
-        public override IRgbRender Render(float dt)
+        public override IRender Render(float dt)
         {
 			/* Reset all pixels on the render. */
 			_render.Clear();
@@ -83,7 +78,7 @@ namespace Audectra.Extensions.Effects
 			to specify what exactly is configureable. In this method you will specify
 			what controls you request from Audectra for the layer settings side panel
 			of your effect. This method generally only gets called once per layer. */
-        public override void GenerateSettings(ILayerSettingsBuilder settingsBuilder)
+        public override void GenerateSettings(ISettingsBuilder settingsBuilder)
         {
 			settingsBuilder.PageBegin();
 
@@ -112,13 +107,13 @@ namespace Audectra.Extensions.Effects
 			switch ((ValueId)valueId)
 			{
 				/*	The color value has been changed either by the user or a binding. Use the 
-				effect helper to convert the value to a color. */
+				effect api to convert the value to a color. */
 				case ValueId.ColorValue:
 					_color = value;
 					break;
 				
 				/*	The wave speed has been changed either by the user or a binding. Use the
-					effect helper to convert the value to a single. */
+					effect api to convert the value to a single. */
 				case ValueId.WaveSpeed:
 					_waveSimulation.Speed = value;
 					break;
