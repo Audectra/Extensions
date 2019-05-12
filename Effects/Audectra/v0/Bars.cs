@@ -78,7 +78,7 @@ namespace Audectra.Extensions.Effects
             {
                 UpdateBars(dt);
 
-                using (var canvas = _api.CreateCanvas(_render))
+                using (var canvas = _render.CreateCanvas())
                 {
                     canvas.Clear();
 

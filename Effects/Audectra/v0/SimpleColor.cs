@@ -43,7 +43,7 @@ namespace Audectra.Extensions.Effects
         public override IRender Render(float dt)
         {
 			/* 	Map every pixel in the render to the configured color */
-            using (var canvas = _api.CreateCanvas(_render))
+            using (var canvas = _render.CreateCanvas())
                 canvas.Clear(_color);
                 
             return _render;

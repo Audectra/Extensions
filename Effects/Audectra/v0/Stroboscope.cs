@@ -45,7 +45,7 @@ namespace Audectra.Extensions.Effects
                 _color = _color.WithScale(1f - _flashDuration / MaxFlashDuration);
             }
 
-            using (var canvas = _api.CreateCanvas(_render))
+            using (var canvas = _render.CreateCanvas())
                 canvas.Clear(_color);
                 
             return _render;

@@ -38,7 +38,7 @@ namespace Audectra.Extensions.Effects
 
         public override IRender Render(float dt)
         {
-            using (var canvas = _api.CreateCanvas(_render))
+            using (var canvas = _render.CreateCanvas())
             {
                 canvas.Clear();
 

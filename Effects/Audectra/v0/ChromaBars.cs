@@ -45,7 +45,7 @@ namespace Audectra.Extensions.Effects
         {
             var chromas = _featureCache.GetChromas();
 
-            using (var canvas = _api.CreateCanvas(_render))
+            using (var canvas = _render.CreateCanvas())
             {
                 canvas.Clear();
 

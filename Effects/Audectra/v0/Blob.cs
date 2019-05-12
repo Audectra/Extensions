@@ -57,7 +57,7 @@ namespace Audectra.Extensions.Effects
         {
             float blobSize = (Height > 1) ? 0.5f * (_xSize + _ySize) : _xSize;
 
-            using (var canvas = _api.CreateCanvas(_render))
+            using (var canvas = _render.CreateCanvas())
             using (SKPaint paint = new SKPaint())
             {
                 canvas.Clear();
