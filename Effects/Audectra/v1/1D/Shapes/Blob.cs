@@ -11,7 +11,7 @@ using Audectra.Extensions.Sdk.V1;
 namespace Audectra.Extensions.Effects
 {
     [MinNumberOfPixels(8)]
-    [EffectExtension("Blob", "Audectra", "v0.0.1")]
+    [EffectExtension("Blob", "Audectra", "v0.0.2")]
     class Blob : EffectExtensionBase
     {
         private IEffectApi _api;
@@ -67,7 +67,7 @@ namespace Audectra.Extensions.Effects
             settingsBuilder.AddColorGroup(_color, (uint)SettingId.Color);
 
             settingsBuilder.GroupBegin("Position");
-            settingsBuilder.AddSlider(_x0Pos, 0, Width, (uint)SettingId.XPosition);
+            settingsBuilder.AddBindableSlider(_x0Pos, 0, Width, (uint)SettingId.XPosition);
 
             settingsBuilder.GroupEnd();
 
